@@ -1,0 +1,213 @@
+[
+    {
+        "type": "post_call_transcription",
+        "event_timestamp": 1751802025,
+        "data": {
+            "agent_id": "agent_01jxbrc1trfxev5sdp5xk4ra67",
+            "conversation_id": "conv_01jzfrjvcce0vsea1fcbpp9p04",
+            "status": "done",
+            "user_id": null,
+            "transcript": [
+                {
+                    "role": "agent",
+                    "message": "Hello, Sheila. Whenever you’re ready, we can pick up where we left off or dive into a new story...",
+                    "tool_calls": [],
+                    "tool_results": [],
+                    "feedback": null,
+                    "llm_override": null,
+                    "time_in_call_secs": 0,
+                    "conversation_turn_metrics": null,
+                    "rag_retrieval_info": null,
+                    "llm_usage": null,
+                    "interrupted": true,
+                    "original_message": "Hello, Sheila. Whenever you’re ready, we can pick up where we left off or dive into a new story together...",
+                    "source_medium": null
+                }
+            ],
+            "metadata": {
+                "start_time_unix_secs": 1751802015,
+                "accepted_time_unix_secs": 1751802015,
+                "call_duration_secs": 7,
+                "cost": 45,
+                "deletion_settings": {
+                    "deletion_time_unix_secs": null,
+                    "deleted_logs_at_time_unix_secs": null,
+                    "deleted_audio_at_time_unix_secs": null,
+                    "deleted_transcript_at_time_unix_secs": null,
+                    "delete_transcript_and_pii": false,
+                    "delete_audio": false
+                },
+                "feedback": {
+                    "overall_score": null,
+                    "likes": 0,
+                    "dislikes": 0
+                },
+                "authorization_method": "signed_url",
+                "charging": {
+                    "dev_discount": false,
+                    "is_burst": false,
+                    "tier": "creator",
+                    "llm_usage": {
+                        "irreversible_generation": {
+                            "model_usage": {}
+                        },
+                        "initiated_generation": {
+                            "model_usage": {}
+                        }
+                    },
+                    "llm_price": 0,
+                    "llm_charge": 0,
+                    "call_charge": 45
+                },
+                "phone_call": {
+                    "direction": "inbound",
+                    "phone_number_id": "phnum_01jxj3hwx1fava7g3snzm5e2f8",
+                    "agent_number": "+16123241623",
+                    "external_number": "+16129782029",
+                    "type": "twilio",
+                    "stream_sid": "MZe63f1e3ba93dfcdb5a13ab199fa83d37",
+                    "call_sid": "CA9bdb3ecff3c954b39e660497cd35e7ca"
+                },
+                "batch_call": null,
+                "termination_reason": "Client disconnected: 1005",
+                "error": null,
+                "main_language": "en",
+                "rag_usage": {
+                    "usage_count": 0,
+                    "embedding_model": "e5_mistral_7b_instruct"
+                },
+                "text_only": false,
+                "features_usage": {
+                    "language_detection": {
+                        "enabled": false,
+                        "used": false
+                    },
+                    "transfer_to_agent": {
+                        "enabled": false,
+                        "used": false
+                    },
+                    "transfer_to_number": {
+                        "enabled": true,
+                        "used": false
+                    },
+                    "multivoice": {
+                        "enabled": false,
+                        "used": false
+                    },
+                    "pii_zrm_workspace": false,
+                    "pii_zrm_agent": false
+                },
+                "eleven_assistant": {
+                    "is_eleven_assistant": false
+                },
+                "initiator_id": null
+            },
+            "analysis": {
+                "evaluation_criteria_results": {
+                    "session_closure": {
+                        "criteria_id": "session_closure",
+                        "result": "failure",
+                        "rationale": "The conversation ended abruptly after the agent's initial greeting. There was no summary of key points, gratitude, or a positive closing note."
+                    },
+                    "empathy_displayed": {
+                        "criteria_id": "empathy_displayed",
+                        "result": "success",
+                        "rationale": "The agent acknowledged the user's name and offered options, showing a degree of personalization and acknowledging a previous interaction, which suggests empathy."
+                    },
+                    "memory_utilized": {
+                        "criteria_id": "memory_utilized",
+                        "result": "unknown",
+                        "rationale": "The agent greets the user by name, but without prior conversation history, it's impossible to determine if this is personalized based on memory or a generic greeting. Therefore, it's unknown if the agent used memory."
+                    },
+                    "name_captured": {
+                        "criteria_id": "name_captured",
+                        "result": "success",
+                        "rationale": "The agent used the name 'Sheila' at the beginning of the conversation, implying it either remembered the name from a previous interaction or had access to it. The agent did not ask for confirmation, but the use of the name suggests it was already known and considered correct."
+                    },
+                    "positive_interaction": {
+                        "criteria_id": "positive_interaction",
+                        "result": "unknown",
+                        "rationale": "The conversation is too short to determine the user's comfort level, engagement, or reaction. There is only one message from the agent."
+                    }
+                },
+                "data_collection_results": {
+                    "session_date": {
+                        "data_collection_id": "session_date",
+                        "value": "1751802015",
+                        "json_schema": {
+                            "type": "string",
+                            "description": "Extract the date and time of the conversation.",
+                            "dynamic_variable": "",
+                            "constant_value": ""
+                        },
+                        "rationale": "The conversation started at timestamp 1751802015, which corresponds to a specific date and time. Converting this timestamp to a human-readable format gives us the date and time of the conversation."
+                    },
+                    "comfort_level": {
+                        "data_collection_id": "comfort_level",
+                        "value": "Whenever you’re ready, we can pick up where we left off or dive into a new story...",
+                        "json_schema": {
+                            "type": "string",
+                            "description": "Extract any mention of the user’s comfort or willingness to proceed with the interview.",
+                            "dynamic_variable": "",
+                            "constant_value": ""
+                        },
+                        "rationale": "The agent asks \"Whenever you’re ready, we can pick up where we left off or dive into a new story...\", which implies a question about the user's readiness or willingness to proceed. Therefore, I extract this part of the message."
+                    },
+                    "key_life_event": {
+                        "data_collection_id": "key_life_event",
+                        "value": null,
+                        "json_schema": {
+                            "type": "string",
+                            "description": "Extract any major life event or story shared by the user during the session.",
+                            "dynamic_variable": "",
+                            "constant_value": ""
+                        },
+                        "rationale": "The user did not share any major life event or story during the session. The agent only provided a greeting and offered options for continuing or starting a new story."
+                    },
+                    "user_name": {
+                        "data_collection_id": "user_name",
+                        "value": "Sheila",
+                        "json_schema": {
+                            "type": "string",
+                            "description": "Extract the user’s full name as provided or confirmed by the agent. Leave blank if not available.",
+                            "dynamic_variable": "",
+                            "constant_value": ""
+                        },
+                        "rationale": "The agent addresses the user as \"Sheila\". This is likely the user's name."
+                    },
+                    "consent_given": {
+                        "data_collection_id": "consent_given",
+                        "value": null,
+                        "json_schema": {
+                            "type": "string",
+                            "description": "Mark as true if the user explicitly gave consent to record or share their story; false otherwise.",
+                            "dynamic_variable": "",
+                            "constant_value": ""
+                        },
+                        "rationale": "The user did not explicitly give consent to record or share their story in the provided conversation."
+                    }
+                },
+                "call_successful": "failure",
+                "transcript_summary": "The AI agent greeted Sheila, offering to continue a previous story or start a new one.\n"
+            },
+            "conversation_initiation_client_data": {
+                "conversation_config_override": {
+                    "tts": null,
+                    "conversation": null,
+                    "agent": null
+                },
+                "custom_llm_extra_body": {},
+                "user_id": null,
+                "dynamic_variables": {
+                    "system__agent_id": "agent_01jxbrc1trfxev5sdp5xk4ra67",
+                    "system__conversation_id": "conv_01jzfrjvcce0vsea1fcbpp9p04",
+                    "system__caller_id": "+16129782029",
+                    "system__called_number": "+16123241623",
+                    "system__call_duration_secs": 6,
+                    "system__time_utc": "2025-07-06T11:40:22.097236+00:00",
+                    "system__call_sid": "CA9bdb3ecff3c954b39e660497cd35e7ca"
+                }
+            }
+        }
+    }
+]

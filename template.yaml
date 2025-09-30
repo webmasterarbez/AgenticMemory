@@ -1,0 +1,227 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AgenticMemories - ElevenLabs Agents with Mem0 Cloud Integration
+
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: agentic-memories
+    Description: ElevenLabs Agents with Mem0 Cloud Integration
+    Author: AgenticMemories
+    SemanticVersion: 1.0.0
+
+Parameters:
+  Mem0ApiKey:
+    Type: String
+    NoEcho: true
+    Description: Mem0 API Key
+
+  Mem0OrgId:
+    Type: String
+    Description: Mem0 Organization ID
+
+  Mem0ProjectId:
+    Type: String
+    Description: Mem0 Project ID
+
+  ElevenLabsWorkspaceKey:
+    Type: String
+    NoEcho: true
+    Description: ElevenLabs Workspace Secret Key for ClientData webhook
+
+  ElevenLabsHmacKey:
+    Type: String
+    NoEcho: true
+    Description: ElevenLabs HMAC Signing Key for PostCall webhook
+
+Globals:
+  Function:
+    Runtime: python3.12
+    MemorySize: 256
+    Timeout: 30
+    Architectures:
+      - x86_64
+    Tracing: Active
+    Tags:
+      Project: AgenticMemories
+      Environment: Production
+      ManagedBy: SAM
+
+Resources:
+  # Lambda Layer
+  AgenticMemoriesLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: AgenticMemoriesLambdaLayer
+      Description: Contains mem0ai package
+      ContentUri: layer/
+      CompatibleRuntimes:
+        - python3.12
+    Metadata:
+      BuildMethod: python3.12
+
+  # IAM Role
+  AgenticMemoriesLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+      Tags:
+        - Key: Project
+          Value: AgenticMemories
+        - Key: ManagedBy
+          Value: SAM
+
+  # CloudWatch Log Groups
+  AgenticMemoriesClientDataLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/AgenticMemoriesClientData
+      RetentionInDays: 7
+
+  AgenticMemoriesRetrieveLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/AgenticMemoriesRetrieve
+      RetentionInDays: 7
+
+  AgenticMemoriesPostCallLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/AgenticMemoriesPostCall
+      RetentionInDays: 7
+
+  # Lambda Functions
+  AgenticMemoriesClientData:
+    Type: AWS::Serverless::Function
+    DependsOn: AgenticMemoriesClientDataLogGroup
+    Properties:
+      FunctionName: AgenticMemoriesClientData
+      CodeUri: src/client_data/
+      Handler: handler.lambda_handler
+      Role: !GetAtt AgenticMemoriesLambdaRole.Arn
+      Layers:
+        - !Ref AgenticMemoriesLambdaLayer
+      Environment:
+        Variables:
+          MEM0_API_KEY: !Ref Mem0ApiKey
+          MEM0_ORG_ID: !Ref Mem0OrgId
+          MEM0_PROJECT_ID: !Ref Mem0ProjectId
+          MEM0_DIR: /tmp/.mem0
+          ELEVENLABS_WORKSPACE_KEY: !Ref ElevenLabsWorkspaceKey
+      Events:
+        HttpApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AgenticMemoriesClientDataHttpApi
+            Path: /client-data
+            Method: POST
+
+  AgenticMemoriesRetrieve:
+    Type: AWS::Serverless::Function
+    DependsOn: AgenticMemoriesRetrieveLogGroup
+    Properties:
+      FunctionName: AgenticMemoriesRetrieve
+      CodeUri: src/retrieve/
+      Handler: handler.lambda_handler
+      Role: !GetAtt AgenticMemoriesLambdaRole.Arn
+      Layers:
+        - !Ref AgenticMemoriesLambdaLayer
+      Environment:
+        Variables:
+          MEM0_API_KEY: !Ref Mem0ApiKey
+          MEM0_ORG_ID: !Ref Mem0OrgId
+          MEM0_PROJECT_ID: !Ref Mem0ProjectId
+          MEM0_DIR: /tmp/.mem0
+          MEM0_SEARCH_LIMIT: "3"
+          MEM0_TIMEOUT: "5"
+      Events:
+        HttpApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AgenticMemoriesRetrieveHttpApi
+            Path: /retrieve
+            Method: POST
+
+  AgenticMemoriesPostCall:
+    Type: AWS::Serverless::Function
+    DependsOn: AgenticMemoriesPostCallLogGroup
+    Properties:
+      FunctionName: AgenticMemoriesPostCall
+      CodeUri: src/post_call/
+      Handler: handler.lambda_handler
+      Timeout: 60
+      Role: !GetAtt AgenticMemoriesLambdaRole.Arn
+      Layers:
+        - !Ref AgenticMemoriesLambdaLayer
+      Environment:
+        Variables:
+          MEM0_API_KEY: !Ref Mem0ApiKey
+          MEM0_ORG_ID: !Ref Mem0OrgId
+          MEM0_PROJECT_ID: !Ref Mem0ProjectId
+          MEM0_DIR: /tmp/.mem0
+          ELEVENLABS_HMAC_KEY: !Ref ElevenLabsHmacKey
+      Events:
+        HttpApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AgenticMemoriesPostCallHttpApi
+            Path: /post-call
+            Method: POST
+
+  # HTTP API Gateways
+  AgenticMemoriesClientDataHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod
+      Tags:
+        Project: AgenticMemories
+        Endpoint: ClientData
+
+  AgenticMemoriesRetrieveHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod
+      Tags:
+        Project: AgenticMemories
+        Endpoint: Retrieve
+
+  AgenticMemoriesPostCallHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod
+      Tags:
+        Project: AgenticMemories
+        Endpoint: PostCall
+
+Outputs:
+  ClientDataApiUrl:
+    Description: URL for ElevenLabs Conversation Initiation webhook
+    Value: !Sub "https://${AgenticMemoriesClientDataHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/client-data"
+    Export:
+      Name: !Sub "${AWS::StackName}-ClientDataApiUrl"
+
+  RetrieveApiUrl:
+    Description: URL for ElevenLabs agent tool endpoint
+    Value: !Sub "https://${AgenticMemoriesRetrieveHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/retrieve"
+    Export:
+      Name: !Sub "${AWS::StackName}-RetrieveApiUrl"
+
+  PostCallApiUrl:
+    Description: URL for ElevenLabs Post-Call webhook
+    Value: !Sub "https://${AgenticMemoriesPostCallHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/post-call"
+    Export:
+      Name: !Sub "${AWS::StackName}-PostCallApiUrl"
+
+  LambdaRoleArn:
+    Description: ARN of the Lambda execution role
+    Value: !GetAtt AgenticMemoriesLambdaRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-LambdaRoleArn"
