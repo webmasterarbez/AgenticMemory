@@ -7,6 +7,11 @@ Complete test results and production readiness check
 import json
 import requests
 import time
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def test_all_endpoints():
     """Test all three endpoints to confirm production readiness"""
@@ -14,12 +19,12 @@ def test_all_endpoints():
     print("🎯 AGENTICMEMORY PRODUCTION READINESS TEST")
     print("=" * 60)
     
-    # Test URLs
-    CLIENT_DATA_URL = "https://8nv3jj2gie.execute-api.us-east-1.amazonaws.com/Prod/client-data"
+    # Test URLs from environment
+    CLIENT_DATA_URL = os.getenv("ELEVENLABS_CLIENT_DATA_URL")
     RETRIEVE_URL = "https://7h6j2vasna.execute-api.us-east-1.amazonaws.com/Prod/retrieve"
-    POST_CALL_URL = "https://7iumhxcckh.execute-api.us-east-1.amazonaws.com/Prod/post-call"
+    POST_CALL_URL = os.getenv("ELEVENLABS_POST_CALL_URL")
     
-    WORKSPACE_KEY = "wsec_eb779969b7cb5cde6cdd9c6dfc4e2a08fa38cd6711b86eced6c101039871f6ac"
+    WORKSPACE_KEY = os.getenv("ELEVENLABS_WORKSPACE_KEY")
     
     results = {"client_data": False, "retrieve": False, "post_call": False}
     

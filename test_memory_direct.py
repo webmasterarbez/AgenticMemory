@@ -7,12 +7,11 @@ This simulates the memory storage logic to verify it works correctly.
 import os
 import json
 import sys
+from dotenv import load_dotenv
 sys.path.append('/tmp')  # For lambda layer simulation
 
-# Set required environment variables for testing
-os.environ['MEM0_API_KEY'] = 'sk-48UQejW7xNzPAZfzBp4eWXZLzBJ8gLqITXg8BpRz'
-os.environ['MEM0_ORG_ID'] = 'org-AgPuVmnKyoV1XWNz'
-os.environ['MEM0_PROJECT_ID'] = 'proj-xgxJJ7nWBkEuC9Ku'
+# Load environment variables from .env file
+load_dotenv()
 
 # Import after setting env vars
 from mem0 import MemoryClient
