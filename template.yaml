@@ -47,6 +47,35 @@ Globals:
       ManagedBy: SAM
 
 Resources:
+  # S3 Bucket for Post-Call Data Storage
+  ElevenLabsAgenticMemoryBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub elevenlabs-agentic-memory-${AWS::AccountId}-${AWS::Region}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToIA
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 30
+                StorageClass: STANDARD_IA
+              - TransitionInDays: 90
+                StorageClass: GLACIER
+      Tags:
+        - Key: Project
+          Value: AgenticMemories
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Purpose
+          Value: PostCallDataStorage
+
   # Lambda Layer
   AgenticMemoriesLambdaLayer:
     Type: AWS::Serverless::LayerVersion
@@ -73,6 +102,17 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
         - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+      Policies:
+        - PolicyName: S3PostCallDataAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                  - s3:GetObject
+                Resource: !Sub '${ElevenLabsAgenticMemoryBucket.Arn}/*'
       Tags:
         - Key: Project
           Value: AgenticMemories
@@ -168,6 +208,7 @@ Resources:
           MEM0_PROJECT_ID: !Ref Mem0ProjectId
           MEM0_DIR: /tmp/.mem0
           ELEVENLABS_HMAC_KEY: !Ref ElevenLabsHmacKey
+          S3_BUCKET_NAME: !Ref ElevenLabsAgenticMemoryBucket
       Events:
         HttpApi:
           Type: HttpApi
@@ -225,3 +266,9 @@ Outputs:
     Value: !GetAtt AgenticMemoriesLambdaRole.Arn
     Export:
       Name: !Sub "${AWS::StackName}-LambdaRoleArn"
+
+  S3BucketName:
+    Description: S3 bucket for storing post-call data (transcripts and audio)
+    Value: !Ref ElevenLabsAgenticMemoryBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-S3BucketName"

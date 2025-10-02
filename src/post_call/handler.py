@@ -3,6 +3,7 @@ AgenticMemoriesPostCall Lambda Handler
 
 Handles ElevenLabs Post-Call webhook asynchronously.
 Stores factual and semantic memories in Mem0 after call completion.
+Saves conversation JSON and audio MP3 to S3.
 """
 
 import json
@@ -11,9 +12,11 @@ import logging
 import hmac
 import hashlib
 import time
-from typing import Dict, Any, List
+import base64
+from typing import Dict, Any, List, Optional
 from datetime import datetime
 
+import boto3
 from mem0 import MemoryClient
 
 # Configure logging
@@ -27,7 +30,11 @@ client = MemoryClient(
     project_id=os.environ['MEM0_PROJECT_ID']
 )
 
+# Initialize S3 client outside handler for reuse
+s3_client = boto3.client('s3')
+
 HMAC_KEY = os.environ['ELEVENLABS_HMAC_KEY']
+S3_BUCKET_NAME = os.environ['S3_BUCKET_NAME']
 
 
 def verify_hmac_signature(body: str, signature_header: str) -> bool:
@@ -74,6 +81,69 @@ def verify_hmac_signature(body: str, signature_header: str) -> bool:
     except Exception as e:
         logger.error(f"Error verifying HMAC: {str(e)}", exc_info=True)
         return False
+
+
+def save_to_s3(external_number: str, conversation_id: str, payload: Dict[str, Any]) -> None:
+    """
+    Save conversation JSON and audio MP3 to S3.
+
+    Directory structure: {external_number}/{conversation_id}.json and .mp3
+
+    Args:
+        external_number: Caller's phone number (e.g., +15074595005)
+        conversation_id: ElevenLabs conversation ID (e.g., conv_01jxd5y165f62a0v7gtr6bkg56)
+        payload: Full webhook payload
+    """
+    try:
+        # Sanitize external_number for S3 key (remove + prefix if present)
+        sanitized_number = external_number.lstrip('+')
+        
+        # Save JSON payload
+        json_key = f"{sanitized_number}/{conversation_id}.json"
+        logger.info(f"Saving JSON to S3: s3://{S3_BUCKET_NAME}/{json_key}")
+        
+        s3_client.put_object(
+            Bucket=S3_BUCKET_NAME,
+            Key=json_key,
+            Body=json.dumps(payload, indent=2),
+            ContentType='application/json',
+            Metadata={
+                'external_number': external_number,
+                'conversation_id': conversation_id,
+                'timestamp': datetime.utcnow().isoformat()
+            }
+        )
+        logger.info(f"Successfully saved JSON for conversation {conversation_id}")
+
+        # Save MP3 audio if present
+        full_audio_base64 = payload.get('full_audio')
+        if full_audio_base64:
+            try:
+                # Decode base64 audio to binary
+                audio_binary = base64.b64decode(full_audio_base64)
+                
+                mp3_key = f"{sanitized_number}/{conversation_id}.mp3"
+                logger.info(f"Saving MP3 to S3: s3://{S3_BUCKET_NAME}/{mp3_key} ({len(audio_binary)} bytes)")
+                
+                s3_client.put_object(
+                    Bucket=S3_BUCKET_NAME,
+                    Key=mp3_key,
+                    Body=audio_binary,
+                    ContentType='audio/mpeg',
+                    Metadata={
+                        'external_number': external_number,
+                        'conversation_id': conversation_id,
+                        'timestamp': datetime.utcnow().isoformat()
+                    }
+                )
+                logger.info(f"Successfully saved MP3 for conversation {conversation_id}")
+            except Exception as e:
+                logger.error(f"Error saving MP3 to S3: {str(e)}", exc_info=True)
+        else:
+            logger.warning(f"No full_audio field found in payload for conversation {conversation_id}")
+
+    except Exception as e:
+        logger.error(f"Error saving to S3: {str(e)}", exc_info=True)
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -165,6 +235,13 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return response
 
         logger.info(f"Processing post-call data for user_id: {caller_id}")
+
+        # Save to S3 (JSON and MP3)
+        try:
+            save_to_s3(caller_id, conversation_id, payload)
+        except Exception as e:
+            logger.error(f"Error saving to S3: {str(e)}", exc_info=True)
+            # Continue processing - S3 failure shouldn't block memory storage
 
         # Prepare timestamp
         timestamp = datetime.utcnow().isoformat()
