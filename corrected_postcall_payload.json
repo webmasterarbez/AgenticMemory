@@ -1,0 +1,55 @@
+{
+  "conversation_id": "conv_01jzfrjvcce0vsea1fcbpp9p04",
+  "agent_id": "agent_01jxbrc1trfxev5sdp5xk4ra67",
+  "call_duration": 7,
+  "transcript": [
+    {
+      "role": "agent",
+      "message": "Hello, Sheila. Whenever you\u2019re ready, we can pick up where we left off or dive into a new story...",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 0,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": true,
+      "original_message": "Hello, Sheila. Whenever you\u2019re ready, we can pick up where we left off or dive into a new story together...",
+      "source_medium": null
+    }
+  ],
+  "analysis": {
+    "summary": "The AI agent greeted Sheila, offering to continue a previous story or start a new one.\n",
+    "evaluation": {
+      "session_closure": {
+        "criteria_id": "session_closure",
+        "result": "failure",
+        "rationale": "The conversation ended abruptly after the agent's initial greeting. There was no summary of key points, gratitude, or a positive closing note."
+      },
+      "empathy_displayed": {
+        "criteria_id": "empathy_displayed",
+        "result": "success",
+        "rationale": "The agent acknowledged the user's name and offered options, showing a degree of personalization and acknowledging a previous interaction, which suggests empathy."
+      },
+      "memory_utilized": {
+        "criteria_id": "memory_utilized",
+        "result": "unknown",
+        "rationale": "The agent greets the user by name, but without prior conversation history, it's impossible to determine if this is personalized based on memory or a generic greeting. Therefore, it's unknown if the agent used memory."
+      },
+      "name_captured": {
+        "criteria_id": "name_captured",
+        "result": "success",
+        "rationale": "The agent used the name 'Sheila' at the beginning of the conversation, implying it either remembered the name from a previous interaction or had access to it. The agent did not ask for confirmation, but the use of the name suggests it was already known and considered correct."
+      },
+      "positive_interaction": {
+        "criteria_id": "positive_interaction",
+        "result": "unknown",
+        "rationale": "The conversation is too short to determine the user's comfort level, engagement, or reaction. There is only one message from the agent."
+      }
+    }
+  },
+  "metadata": {
+    "caller_id": "+16129782029"
+  }
+}

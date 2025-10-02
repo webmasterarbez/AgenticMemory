@@ -112,18 +112,56 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
         # Parse payload
         payload = json.loads(raw_body)
+        
+        # Handle ElevenLabs formats:
+        # Format 1 (array): [{"type": "post_call_transcription", "data": {...}}]
+        # Format 2 (object): {"type": "post_call_transcription", "event_timestamp": ..., "data": {...}}
+        if isinstance(payload, list) and len(payload) > 0:
+            if 'data' in payload[0]:
+                logger.info("Detected ElevenLabs array format, extracting data")
+                payload = payload[0]['data']
+        elif isinstance(payload, dict) and 'data' in payload and 'type' in payload:
+            # Single object with type and data fields
+            logger.info(f"Detected ElevenLabs object format (type={payload.get('type')}), extracting data")
+            payload = payload['data']
 
         # Extract required fields
         conversation_id = payload.get('conversation_id', 'unknown')
         agent_id = payload.get('agent_id', 'unknown')
-        call_duration = payload.get('call_duration', 0)
-        transcript = payload.get('transcript', [])
-        analysis = payload.get('analysis', {})
+        
+        # Get metadata - handle both formats
         metadata = payload.get('metadata', {})
+        call_duration = metadata.get('call_duration_secs', payload.get('call_duration', 0))
+        
+        # Get transcript
+        transcript = payload.get('transcript', [])
+        
+        # Get analysis - handle both formats
+        analysis = payload.get('analysis', {})
+        
+        # Extract caller_id from multiple possible locations
+        caller_id = None
+        
+        # 1. Try metadata.caller_id (direct format)
         caller_id = metadata.get('caller_id')
+        
+        # 2. Try metadata.phone_call.external_number (ElevenLabs format)
+        if not caller_id and 'phone_call' in metadata:
+            caller_id = metadata['phone_call'].get('external_number')
+            logger.info(f"Extracted caller_id from metadata.phone_call.external_number: {caller_id}")
+        
+        # 3. Try conversation_initiation_client_data.dynamic_variables.system__caller_id
+        if not caller_id and 'conversation_initiation_client_data' in payload:
+            conv_init = payload['conversation_initiation_client_data']
+            dvars = conv_init.get('dynamic_variables', {})
+            caller_id = dvars.get('system__caller_id')
+            if caller_id:
+                logger.info(f"Extracted caller_id from conversation_initiation_client_data: {caller_id}")
 
         if not caller_id:
-            logger.error("Missing caller_id in metadata")
+            logger.error("Missing caller_id in all expected locations")
+            logger.error(f"Payload keys: {list(payload.keys())}")
+            logger.error(f"Metadata keys: {list(metadata.keys())}")
             return response
 
         logger.info(f"Processing post-call data for user_id: {caller_id}")
@@ -141,15 +179,34 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
         # Store Factual Memory (summary + evaluation)
         try:
-            summary = analysis.get('summary', '')
-            evaluation = analysis.get('evaluation', {})
+            # Handle both 'summary' and 'transcript_summary' fields
+            summary = analysis.get('summary') or analysis.get('transcript_summary', '')
+            
+            # Handle both 'evaluation' and 'evaluation_criteria_results' fields
+            evaluation = analysis.get('evaluation') or analysis.get('evaluation_criteria_results', {})
 
             # Combine summary and evaluation rationale
             factual_content = summary
             if evaluation:
-                rationale = evaluation.get('rationale', '')
-                if rationale:
-                    factual_content += f"\n\nEvaluation: {rationale}"
+                # Handle both formats: direct rationale or criteria results
+                if isinstance(evaluation, dict):
+                    # ElevenLabs format: evaluation_criteria_results with multiple criteria
+                    if 'rationale' in evaluation:
+                        # Direct format
+                        rationale = evaluation.get('rationale', '')
+                        if rationale:
+                            factual_content += f"\n\nEvaluation: {rationale}"
+                    else:
+                        # Criteria results format
+                        eval_summary = []
+                        for criteria_name, criteria_data in evaluation.items():
+                            if isinstance(criteria_data, dict):
+                                result = criteria_data.get('result', 'unknown')
+                                rationale = criteria_data.get('rationale', '')
+                                if rationale:
+                                    eval_summary.append(f"{criteria_name}: {result} - {rationale}")
+                        if eval_summary:
+                            factual_content += f"\n\nEvaluation:\n" + "\n".join(eval_summary)
 
             if factual_content:
                 factual_metadata = {**common_metadata, 'type': 'factual'}
@@ -167,15 +224,38 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Store Semantic Memory (full transcript)
         try:
             if transcript and len(transcript) > 0:
-                semantic_metadata = {**common_metadata, 'type': 'semantic'}
+                # Transform ElevenLabs transcript format to Mem0 format
+                # ElevenLabs: {"role": "agent"/"user", "message": "..."}
+                # Mem0: {"role": "assistant"/"user", "content": "..."}
+                transformed_transcript = []
+                for msg in transcript:
+                    if isinstance(msg, dict):
+                        role = msg.get('role', 'user')
+                        # Map 'agent' to 'assistant' for Mem0
+                        if role == 'agent':
+                            role = 'assistant'
+                        
+                        # Get message content from either 'message' or 'content' field
+                        content = msg.get('message') or msg.get('content', '')
+                        
+                        if content:  # Only add messages with content
+                            transformed_transcript.append({
+                                'role': role,
+                                'content': content
+                            })
+                
+                if transformed_transcript:
+                    semantic_metadata = {**common_metadata, 'type': 'semantic'}
 
-                client.add(
-                    messages=transcript,
-                    user_id=caller_id,
-                    metadata=semantic_metadata,
-                    version="v2"
-                )
-                logger.info(f"Stored semantic memory for {caller_id} ({len(transcript)} messages)")
+                    client.add(
+                        messages=transformed_transcript,
+                        user_id=caller_id,
+                        metadata=semantic_metadata,
+                        version="v2"
+                    )
+                    logger.info(f"Stored semantic memory for {caller_id} ({len(transformed_transcript)} messages)")
+                else:
+                    logger.warning(f"No valid messages found in transcript for {caller_id}")
         except Exception as e:
             logger.error(f"Error storing semantic memory: {str(e)}", exc_info=True)
 

@@ -37,8 +37,14 @@ sam local start-api
 # Install dev dependencies
 pip install -r requirements.txt
 
-# Run tests
+# Run unit tests
 pytest tests/
+
+# Run integration tests (requires deployed stack)
+python3 test_clientdata.py      # Test ClientData endpoint with auth
+python3 test_postcall.py         # Test PostCall endpoint with HMAC
+python3 test_personalized_greetings.py  # Test greeting generation
+python3 test_production_ready.py # Comprehensive production tests
 ```
 
 ### Monitoring
@@ -57,7 +63,7 @@ aws cloudformation delete-stack --stack-name AgenticMemoriesStack
 ## Architecture
 
 ### Three-Function Design
-- **ClientData** (`src/client_data/handler.py`): Pre-call memory retrieval triggered by ElevenLabs Conversation Initiation webhook. Returns all memories for caller, formats them into prompt override for agent context.
+- **ClientData** (`src/client_data/handler.py`): Pre-call memory retrieval triggered by ElevenLabs Conversation Initiation webhook. Returns all memories for caller, extracts caller name, generates personalized greeting, and formats context into prompt override for agent.
 - **Retrieve** (`src/retrieve/handler.py`): In-call semantic search triggered by agent tool. Returns top N relevant memories based on query.
 - **PostCall** (`src/post_call/handler.py`): Post-call async memory storage triggered by webhook. Stores both factual (summary) and semantic (transcript) memories.
 
@@ -70,6 +76,20 @@ Each function has its own HTTP API Gateway for minimal latency (no routing overh
 - **User ID**: Phone number format (e.g., `+16129782029`) used as Mem0 `user_id`
 
 ## Critical Patterns
+
+### Personalized Greetings (ClientData)
+ClientData automatically extracts caller names from memories using regex patterns and generates personalized greetings based on:
+- Caller name (if found in factual or semantic memories)
+- Returning vs new caller status
+- Account status (premium, VIP, gold, silver tiers)
+- Last interaction context (inquiry, issue resolution)
+- Communication preferences (email, phone)
+
+Key functions in `src/client_data/handler.py`:
+- `extract_caller_name()` - Extracts name from memory strings using multiple patterns
+- `generate_personalized_greeting()` - Creates contextual greeting based on caller info
+
+The greeting is returned in the `first_message` field of the agent config override.
 
 ### Mem0 Client Initialization
 **ALWAYS initialize Mem0 client OUTSIDE the handler** for reuse across Lambda invocations:
@@ -111,25 +131,29 @@ if workspace_key != WORKSPACE_KEY:
 
 ### Response Format Conventions
 
-**ClientData** returns ElevenLabs-specific format with prompt override:
+**ClientData** returns ElevenLabs-specific format with prompt override and personalized greeting:
 ```python
 {
     "type": "conversation_initiation_client_data",
     "dynamic_variables": {
         "caller_id": "...",
+        "caller_name": "...",  # Extracted from memories if available
         "memory_count": "...",
         "memory_summary": "...",
-        "is_returning_caller": "true/false"
+        "returning_caller": "yes/no"
     },
     "conversation_config_override": {
         "agent": {
             "prompt": {
                 "prompt": "# Known Information About This Caller:\n..."
-            }
+            },
+            "first_message": "Hello [Name]! ..."  # Personalized greeting
         }
     }
 }
 ```
+
+**Note**: ClientData supports both `caller_id` and `system__caller_id` field names from ElevenLabs.
 
 **Retrieve** returns simple memory array:
 ```python
@@ -200,16 +224,21 @@ All Lambdas share these environment variables (configured via SAM template param
 AgenticMemory/
 ├── template.yaml              # SAM CloudFormation template
 ├── requirements.txt           # Dev dependencies (pytest, boto3)
+├── test_*.py                  # Integration test scripts (clientdata, postcall, greetings, etc.)
 ├── layer/
 │   ├── requirements.txt       # Lambda layer dependencies (mem0ai only)
 │   └── python/                # Built layer contents (generated)
+├── tests/
+│   └── test_client_data_unit.py  # Unit tests
 └── src/
-    ├── client_data/handler.py # Pre-call: auth + get_all() + prompt formatting
+    ├── client_data/handler.py # Pre-call: auth + get_all() + name extraction + greeting generation
     ├── retrieve/handler.py    # In-call: search() with limit
     └── post_call/handler.py   # Post-call: HMAC + async add() for 2 memory types
 ```
 
 **Layer separation**: `layer/requirements.txt` only contains `mem0ai`. Root `requirements.txt` has dev dependencies.
+
+**Test organization**: Unit tests in `tests/`, integration tests as `test_*.py` scripts in root.
 
 ## Integration Points
 
@@ -248,6 +277,12 @@ curl -X POST <ClientDataApiUrl> \
   -H "Content-Type: application/json" \
   -H "X-Workspace-Key: <key>" \
   -d '{"caller_id": "+16129782029", "agent_id": "test", "called_number": "+18005551234", "call_sid": "test-123"}'
+
+# Alternative field name (both supported)
+curl -X POST <ClientDataApiUrl> \
+  -H "Content-Type: application/json" \
+  -H "X-Workspace-Key: <key>" \
+  -d '{"system__caller_id": "+16129782029"}'
 ```
 
 ### Retrieve
@@ -273,8 +308,15 @@ curl -X POST <PostCallApiUrl> \
 
 ## References
 
-- [SPECIFICATION.md](./SPECIFICATION.md) - Complete system specification
-- [README.md](./README.md) - Deployment instructions and setup
+### Internal Documentation
+- [SPECIFICATION.md](./SPECIFICATION.md) - Complete technical specification with architecture details
+- [README.md](./README.md) - Comprehensive deployment guide, monitoring, and troubleshooting
+- [ELEVENLABS_SETUP_GUIDE.md](./ELEVENLABS_SETUP_GUIDE.md) - Step-by-step ElevenLabs integration
+- [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) - Quick command reference
+- [SYSTEM_FLOW.md](./SYSTEM_FLOW.md) - System flow diagrams
+- [CHANGELOG.md](./CHANGELOG.md) - Version history and changes
+
+### External Documentation
 - [Mem0 Lambda FAQ](https://docs.mem0.ai/faqs#how-do-i-configure-mem0-for-aws-lambda)
 - [Mem0 ElevenLabs Integration](https://docs.mem0.ai/integrations/elevenlabs)
 - [ElevenLabs Post-Call Webhooks](https://elevenlabs.io/docs/agents-platform/workflows/post-call-webhooks)
