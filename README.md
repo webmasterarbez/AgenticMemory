@@ -23,6 +23,42 @@ This system bridges **ElevenLabs voice agents** with **Mem0 Cloud** for persiste
 - 🔄 **Async processing** to prevent webhook timeouts
 - ⚡ **Optimized performance** with Lambda layer reuse
 
+## 📁 Project Structure
+
+```
+AgenticMemory/
+├── src/                    # Lambda function source code
+│   ├── client_data/        # Pre-call memory retrieval
+│   ├── retrieve/           # Mid-call semantic search
+│   └── post_call/          # Async memory storage
+├── layer/                  # Shared Lambda layer (mem0ai)
+├── docs/                   # 📚 All documentation
+│   ├── README.md           # Documentation index
+│   ├── SPECIFICATION.md    # Technical spec
+│   ├── SYSTEM_FLOW.md      # Architecture diagrams
+│   ├── ELEVENLABS_SETUP_GUIDE.md
+│   ├── QUICK_REFERENCE.md
+│   └── ... (see docs/README.md)
+├── scripts/                # 🧪 Test & utility scripts
+│   ├── README.md           # Scripts index
+│   ├── test_postcall_with_file.py  # ⭐ Main test tool
+│   ├── test_postcall.sh    # Bash wrapper
+│   └── ... (25+ test scripts)
+├── test_data/              # 📋 JSON test payloads
+│   ├── README.md           # Test data index
+│   ├── conv_*.json         # Real conversation files
+│   └── *_payload.json      # Sample payloads
+├── tests/                  # Unit tests
+├── template.yaml           # SAM deployment template
+├── samconfig.toml          # SAM configuration (gitignored)
+└── requirements.txt        # Dev dependencies
+```
+
+**Quick Navigation:**
+- 📖 **Documentation**: See [docs/README.md](docs/README.md)
+- 🧪 **Testing**: See [scripts/README.md](scripts/README.md)  
+- 📊 **Test Data**: See [test_data/README.md](test_data/README.md)
+
 ## Architecture
 
 ```mermaid

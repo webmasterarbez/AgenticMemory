@@ -28,14 +28,32 @@ if len(sys.argv) > 1:
 else:
     conversation_file = "conv_01jxd5y165f62a0v7gtr6bkg56.json"
 
-# Check if file exists
-if not os.path.exists(conversation_file):
+# Check if file exists (try current dir, test_data, or relative path)
+file_paths_to_try = [
+    conversation_file,
+    os.path.join("..", "test_data", conversation_file),
+    os.path.join("..", "test_data", os.path.basename(conversation_file))
+]
+
+file_found = None
+for path in file_paths_to_try:
+    if os.path.exists(path):
+        file_found = path
+        break
+
+if not file_found:
     print(f"❌ ERROR: File not found: {conversation_file}")
+    print("\nTried locations:")
+    for path in file_paths_to_try:
+        print(f"  - {path}")
     print("\nUsage:")
     print(f"  {sys.argv[0]} [conversation_file.json]")
     print("\nExample:")
     print(f"  {sys.argv[0]} conv_01jxk1wejhenk8x8tt9enzxw4a.json")
+    print(f"  {sys.argv[0]} ../test_data/conv_01jxk1wejhenk8x8tt9enzxw4a.json")
     exit(1)
+
+conversation_file = file_found
 
 # Get environment variables (or prompt for them)
 POST_CALL_URL = os.getenv("ELEVENLABS_POST_CALL_URL")

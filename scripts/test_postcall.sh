@@ -8,13 +8,16 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-# Check if .env file exists
-if [ -f .env ]; then
+# Check if .env file exists (look in project root)
+if [ -f ../.env ]; then
+    echo -e "${GREEN}✅ Loading credentials from .env file${NC}"
+    export $(grep -v '^#' ../.env | xargs)
+elif [ -f .env ]; then
     echo -e "${GREEN}✅ Loading credentials from .env file${NC}"
     export $(grep -v '^#' .env | xargs)
 else
     echo -e "${YELLOW}⚠️  No .env file found. You'll be prompted for credentials.${NC}"
-    echo "   Create a .env file with:"
+    echo "   Create a .env file in project root with:"
     echo "   ELEVENLABS_POST_CALL_URL=https://..."
     echo "   ELEVENLABS_HMAC_KEY=wsec_..."
     echo ""
@@ -27,14 +30,20 @@ else
     CONV_FILE="conv_01jxd5y165f62a0v7gtr6bkg56.json"
 fi
 
-# Check if file exists
-if [ ! -f "$CONV_FILE" ]; then
+# Check if file exists (try current dir first, then test_data)
+if [ -f "$CONV_FILE" ]; then
+    FILE_PATH="$CONV_FILE"
+elif [ -f "../test_data/$CONV_FILE" ]; then
+    FILE_PATH="../test_data/$CONV_FILE"
+    echo -e "${GREEN}📁 Found file in test_data directory${NC}"
+else
     echo -e "${RED}❌ Error: File not found: $CONV_FILE${NC}"
     echo ""
-    echo "Available conversation files:"
-    ls -1 conv_*.json 2>/dev/null || echo "  (none found)"
+    echo "Available conversation files in test_data/:"
+    ls -1 ../test_data/conv_*.json 2>/dev/null | xargs -n1 basename || echo "  (none found)"
     exit 1
 fi
+CONV_FILE="$FILE_PATH"
 
 echo -e "${GREEN}🚀 Testing PostCall with: $CONV_FILE${NC}"
 echo ""
