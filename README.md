@@ -1,8 +1,8 @@
-# Eleven Labs Agentic Memory# Eleven Labs AgenticMemory# 
+# Eleven Labs Agentic Memory
 
 
 
-> **Conversational Memory for ElevenLabs Voice Agents**> **Conversational Memory for ElevenLabs Voice Agents**
+**Conversational Memory for ElevenLabs Voice Agents**
 
 
 
