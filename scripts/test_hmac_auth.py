@@ -8,13 +8,45 @@ import hmac
 import hashlib
 import time
 import requests
+import sys
+import os
 from datetime import datetime
+from pathlib import Path
 
-# Use a test HMAC key for testing
-TEST_HMAC_KEY = "test_hmac_key_12345"
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    # Load .env from project root
+    env_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(env_path)
+except ImportError:
+    print("⚠️  Warning: python-dotenv not installed. Install with: pip install python-dotenv")
+    sys.exit(1)
 
-# Post-call webhook URL
-WEBHOOK_URL = "https://7iumhxcckh.execute-api.us-east-1.amazonaws.com/Prod/post-call"
+# Configuration from .env
+WEBHOOK_URL = os.getenv('ELEVENLABS_POST_CALL_URL')
+TEST_HMAC_KEY = os.getenv('ELEVENLABS_HMAC_KEY')
+
+# Validate required environment variables
+if not WEBHOOK_URL:
+    print("❌ ERROR: ELEVENLABS_POST_CALL_URL not found in .env file")
+    sys.exit(1)
+
+if not TEST_HMAC_KEY:
+    print("❌ ERROR: ELEVENLABS_HMAC_KEY not found in .env file")
+    sys.exit(1)
+
+# Validate URL format
+if not WEBHOOK_URL.startswith('https://'):
+    print(f"❌ ERROR: Invalid WEBHOOK_URL format: {WEBHOOK_URL}")
+    print("   URL must start with 'https://'")
+    sys.exit(1)
+
+# Validate HMAC key format
+if not TEST_HMAC_KEY.startswith('wsec_'):
+    print(f"❌ ERROR: Invalid HMAC_KEY format: {TEST_HMAC_KEY}")
+    print("   Key must start with 'wsec_'")
+    sys.exit(1)
 
 def generate_hmac_signature(payload, timestamp, secret_key):
     """Generate HMAC signature for ElevenLabs webhook"""

@@ -92,6 +92,7 @@ Resources:
   AgenticMemoriesLambdaRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: elevenlabs-agentic-memory-role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -123,19 +124,19 @@ Resources:
   AgenticMemoriesClientDataLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: /aws/lambda/AgenticMemoriesClientData
+      LogGroupName: /aws/lambda/elevenlabs-agentic-memory-log-client-data
       RetentionInDays: 7
 
   AgenticMemoriesRetrieveLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: /aws/lambda/AgenticMemoriesRetrieve
+      LogGroupName: /aws/lambda/elevenlabs-agentic-memory-log-search-data
       RetentionInDays: 7
 
   AgenticMemoriesPostCallLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: /aws/lambda/AgenticMemoriesPostCall
+      LogGroupName: /aws/lambda/elevenlabs-agentic-memory-log-post-call
       RetentionInDays: 7
 
   # Lambda Functions
@@ -143,7 +144,7 @@ Resources:
     Type: AWS::Serverless::Function
     DependsOn: AgenticMemoriesClientDataLogGroup
     Properties:
-      FunctionName: AgenticMemoriesClientData
+      FunctionName: elevenlabs-agentic-memory-lambda-function-client-data
       CodeUri: src/client_data/
       Handler: handler.lambda_handler
       Role: !GetAtt AgenticMemoriesLambdaRole.Arn
@@ -168,7 +169,7 @@ Resources:
     Type: AWS::Serverless::Function
     DependsOn: AgenticMemoriesRetrieveLogGroup
     Properties:
-      FunctionName: AgenticMemoriesRetrieve
+      FunctionName: elevenlabs-agentic-memory-lambda-function-search-data
       CodeUri: src/retrieve/
       Handler: handler.lambda_handler
       Role: !GetAtt AgenticMemoriesLambdaRole.Arn
@@ -194,7 +195,7 @@ Resources:
     Type: AWS::Serverless::Function
     DependsOn: AgenticMemoriesPostCallLogGroup
     Properties:
-      FunctionName: AgenticMemoriesPostCall
+      FunctionName: elevenlabs-agentic-memory-lambda-function-post-call
       CodeUri: src/post_call/
       Handler: handler.lambda_handler
       Timeout: 120
@@ -221,6 +222,7 @@ Resources:
   AgenticMemoriesClientDataHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Name: elevenlabs-agentic-memory-api-gateway-client-data
       StageName: Prod
       Tags:
         Project: AgenticMemories
@@ -229,6 +231,7 @@ Resources:
   AgenticMemoriesRetrieveHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Name: elevenlabs-agentic-memory-api-gateway-search-data
       StageName: Prod
       Tags:
         Project: AgenticMemories
@@ -237,6 +240,7 @@ Resources:
   AgenticMemoriesPostCallHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Name: elevenlabs-agentic-memory-api-gateway-post-call
       StageName: Prod
       Tags:
         Project: AgenticMemories

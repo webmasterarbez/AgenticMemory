@@ -2,15 +2,33 @@
 """Test the Retrieve endpoint for semantic search"""
 import json
 import subprocess
+import sys
+import os
+from pathlib import Path
 
-# Read env vars
-env = {}
-for line in open('.env'):
-    if '=' in line and not line.startswith('#'):
-        k, v = line.strip().split('=', 1)
-        env[k] = v
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    # Load .env from project root
+    env_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(env_path)
+except ImportError:
+    print("⚠️  Warning: python-dotenv not installed. Install with: pip install python-dotenv")
+    sys.exit(1)
 
-RETRIEVE_URL = env.get('ELEVENLABS_RETRIEVE_URL', 'https://7h6j2vasna.execute-api.us-east-1.amazonaws.com/Prod/retrieve')
+# Configuration from .env
+RETRIEVE_URL = os.getenv('ELEVENLABS_RETRIEVE_URL')
+
+# Validate required environment variables
+if not RETRIEVE_URL:
+    print("❌ ERROR: ELEVENLABS_RETRIEVE_URL not found in .env file")
+    sys.exit(1)
+
+# Validate URL format
+if not RETRIEVE_URL.startswith('https://'):
+    print(f"❌ ERROR: Invalid RETRIEVE_URL format: {RETRIEVE_URL}")
+    print("   URL must start with 'https://'")
+    sys.exit(1)
 
 print("=== Testing Retrieve Endpoint ===\n")
 print(f"URL: {RETRIEVE_URL}")

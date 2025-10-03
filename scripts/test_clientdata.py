@@ -6,10 +6,44 @@ Tests memory retrieval for pre-call personalization
 
 import json
 import requests
+import sys
+import os
+from pathlib import Path
 
-# Configuration
-CLIENTDATA_URL = "https://8nv3jj2gie.execute-api.us-east-1.amazonaws.com/Prod/client-data"
-WORKSPACE_KEY = input("Enter your ElevenLabs Workspace Key: ").strip()
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    # Load .env from project root
+    env_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(env_path)
+except ImportError:
+    print("⚠️  Warning: python-dotenv not installed. Install with: pip install python-dotenv")
+    sys.exit(1)
+
+# Configuration from .env
+CLIENTDATA_URL = os.getenv('ELEVENLABS_CLIENT_DATA_URL')
+WORKSPACE_KEY = os.getenv('ELEVENLABS_WORKSPACE_KEY')
+
+# Validate required environment variables
+if not CLIENTDATA_URL:
+    print("❌ ERROR: ELEVENLABS_CLIENT_DATA_URL not found in .env file")
+    sys.exit(1)
+
+if not WORKSPACE_KEY:
+    print("❌ ERROR: ELEVENLABS_WORKSPACE_KEY not found in .env file")
+    sys.exit(1)
+
+# Validate URL format
+if not CLIENTDATA_URL.startswith('https://'):
+    print(f"❌ ERROR: Invalid CLIENTDATA_URL format: {CLIENTDATA_URL}")
+    print("   URL must start with 'https://'")
+    sys.exit(1)
+
+# Validate workspace key format
+if not WORKSPACE_KEY.startswith('wsec_'):
+    print(f"❌ ERROR: Invalid WORKSPACE_KEY format: {WORKSPACE_KEY}")
+    print("   Key must start with 'wsec_'")
+    sys.exit(1)
 
 # Test payload for client data request
 payload = {

@@ -6,11 +6,33 @@ Test post-call webhook without HMAC for functional testing
 import json
 import requests
 import time
+import sys
+import os
+from pathlib import Path
+
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    # Load .env from project root
+    env_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(env_path)
+except ImportError:
+    print("⚠️  Warning: python-dotenv not installed. Install with: pip install python-dotenv")
+    sys.exit(1)
 
 def test_post_call_no_auth():
     """Test post-call webhook functionality without HMAC authentication"""
     
-    WEBHOOK_URL = "https://7iumhxcckh.execute-api.us-east-1.amazonaws.com/Prod/post-call"
+    WEBHOOK_URL = os.getenv('ELEVENLABS_POST_CALL_URL')
+    
+    # Validate URL
+    if not WEBHOOK_URL:
+        print("❌ ERROR: ELEVENLABS_POST_CALL_URL not found in .env file")
+        sys.exit(1)
+    
+    if not WEBHOOK_URL.startswith('https://'):
+        print(f"❌ ERROR: Invalid WEBHOOK_URL format: {WEBHOOK_URL}")
+        sys.exit(1)
     
     print("🧪 POST-CALL WEBHOOK FUNCTIONAL TEST")
     print("=" * 50)
@@ -122,7 +144,7 @@ def test_memory_retrieval_after():
     """Test if any memories were stored despite auth failure"""
     print("\n🧠 Testing memory retrieval for test caller...")
     
-    CLIENT_DATA_URL = "https://8nv3jj2gie.execute-api.us-east-1.amazonaws.com/Prod/client-data"
+    CLIENT_DATA_URL = "https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data"
     WORKSPACE_KEY = "wsec_eb779969b7cb5cde6cdd9c6dfc4e2a08fa38cd6711b86eced6c101039871f6ac"
     
     test_caller = "+15551234567"

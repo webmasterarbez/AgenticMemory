@@ -21,7 +21,7 @@ def test_all_endpoints():
     
     # Test URLs from environment
     CLIENT_DATA_URL = os.getenv("ELEVENLABS_CLIENT_DATA_URL")
-    RETRIEVE_URL = "https://7h6j2vasna.execute-api.us-east-1.amazonaws.com/Prod/retrieve"
+    RETRIEVE_URL = "https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve"
     POST_CALL_URL = os.getenv("ELEVENLABS_POST_CALL_URL")
     
     WORKSPACE_KEY = os.getenv("ELEVENLABS_WORKSPACE_KEY")
@@ -166,15 +166,15 @@ def display_final_summary(results):
         print("🚀 NEXT STEPS FOR ELEVENLABS INTEGRATION:")
         print("1. Create your ElevenLabs agent")
         print("2. Add Client Data webhook:")
-        print("   URL: https://8nv3jj2gie.execute-api.us-east-1.amazonaws.com/Prod/client-data")
+        print("   URL: https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data")
         print("   Header: X-Workspace-Key: wsec_eb779969b7cb5cde6cdd9c6dfc4e2a08fa38cd6711b86eced6c101039871f6ac")
         print()
         print("3. Add Memory Search tool:")
-        print("   URL: https://7h6j2vasna.execute-api.us-east-1.amazonaws.com/Prod/retrieve")
+        print("   URL: https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve")
         print("   Parameters: query (string), user_id (caller phone number)")
         print()
         print("4. Add Post-Call webhook:")
-        print("   URL: https://7iumhxcckh.execute-api.us-east-1.amazonaws.com/Prod/post-call")
+        print("   URL: https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call")
         print("   HMAC Key: (configured in your ElevenLabs account)")
         print()
         print("💡 Your AgenticMemory system will automatically:")

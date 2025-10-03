@@ -148,7 +148,7 @@ def test_retrieval_with_client_data():
     
     import requests
     
-    CLIENT_DATA_URL = "https://8nv3jj2gie.execute-api.us-east-1.amazonaws.com/Prod/client-data"
+    CLIENT_DATA_URL = "https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data"
     WORKSPACE_KEY = "wsec_eb779969b7cb5cde6cdd9c6dfc4e2a08fa38cd6711b86eced6c101039871f6ac"
     
     test_caller = "+15559876543"

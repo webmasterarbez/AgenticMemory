@@ -5,9 +5,44 @@ Test script for personalized greetings in client data webhook
 
 import json
 import requests
+import sys
+import os
+from pathlib import Path
 
-WEBHOOK_URL = "https://8nv3jj2gie.execute-api.us-east-1.amazonaws.com/Prod/client-data"
-WORKSPACE_KEY = "wsec_eb779969b7cb5cde6cdd9c6dfc4e2a08fa38cd6711b86eced6c101039871f6ac"
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    # Load .env from project root
+    env_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(env_path)
+except ImportError:
+    print("⚠️  Warning: python-dotenv not installed. Install with: pip install python-dotenv")
+    sys.exit(1)
+
+# Configuration from .env
+WEBHOOK_URL = os.getenv('ELEVENLABS_CLIENT_DATA_URL')
+WORKSPACE_KEY = os.getenv('ELEVENLABS_WORKSPACE_KEY')
+
+# Validate required environment variables
+if not WEBHOOK_URL:
+    print("❌ ERROR: ELEVENLABS_CLIENT_DATA_URL not found in .env file")
+    sys.exit(1)
+
+if not WORKSPACE_KEY:
+    print("❌ ERROR: ELEVENLABS_WORKSPACE_KEY not found in .env file")
+    sys.exit(1)
+
+# Validate URL format
+if not WEBHOOK_URL.startswith('https://'):
+    print(f"❌ ERROR: Invalid WEBHOOK_URL format: {WEBHOOK_URL}")
+    print("   URL must start with 'https://'")
+    sys.exit(1)
+
+# Validate workspace key format
+if not WORKSPACE_KEY.startswith('wsec_'):
+    print(f"❌ ERROR: Invalid WORKSPACE_KEY format: {WORKSPACE_KEY}")
+    print("   Key must start with 'wsec_'")
+    sys.exit(1)
 
 def test_client_data(caller_id, description):
     """Test client data endpoint with a specific caller ID"""

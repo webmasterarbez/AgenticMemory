@@ -8,28 +8,34 @@ import hmac
 import hashlib
 import time
 import requests
+import sys
+import os
 from datetime import datetime
+from pathlib import Path
 
-# Get the actual HMAC key from AWS
-import boto3
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    # Load .env from project root
+    env_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(env_path)
+except ImportError:
+    print("⚠️  Warning: python-dotenv not installed. Install with: pip install python-dotenv")
+    sys.exit(1)
 
-def get_hmac_key_from_aws():
-    """Get the actual HMAC key from CloudFormation stack"""
-    try:
-        # Try to get from Lambda environment (won't work from here, but worth trying)
-        cf_client = boto3.client('cloudformation')
-        
-        # Get stack parameters to see what HMAC key was used
-        response = cf_client.describe_stacks(StackName='sam-app')
-        stack = response['Stacks'][0]
-        
-        # The actual key is masked, so we'll use the test key for now
-        # In production, ElevenLabs will use the real key
-        return "test_hmac_key_for_simulation"
-        
-    except Exception as e:
-        print(f"Note: Using test HMAC key (production uses real key): {e}")
-        return "test_hmac_key_for_simulation"
+def get_hmac_key_from_env():
+    """Get the HMAC key from .env file"""
+    hmac_key = os.getenv('ELEVENLABS_HMAC_KEY')
+    
+    if not hmac_key:
+        print("❌ ERROR: ELEVENLABS_HMAC_KEY not found in .env file")
+        sys.exit(1)
+    
+    if not hmac_key.startswith('wsec_'):
+        print(f"❌ ERROR: Invalid HMAC_KEY format: {hmac_key}")
+        sys.exit(1)
+    
+    return hmac_key
 
 def generate_elevenlabs_signature(payload, timestamp, secret_key):
     """Generate ElevenLabs-style HMAC signature"""
@@ -49,8 +55,17 @@ def generate_elevenlabs_signature(payload, timestamp, secret_key):
 def test_post_call_webhook():
     """Test post-call webhook with realistic conversation data"""
     
-    WEBHOOK_URL = "https://7iumhxcckh.execute-api.us-east-1.amazonaws.com/Prod/post-call"
-    HMAC_KEY = get_hmac_key_from_aws()
+    WEBHOOK_URL = os.getenv('ELEVENLABS_POST_CALL_URL')
+    HMAC_KEY = get_hmac_key_from_env()
+    
+    # Validate URL
+    if not WEBHOOK_URL:
+        print("❌ ERROR: ELEVENLABS_POST_CALL_URL not found in .env file")
+        sys.exit(1)
+    
+    if not WEBHOOK_URL.startswith('https://'):
+        print(f"❌ ERROR: Invalid WEBHOOK_URL format: {WEBHOOK_URL}")
+        sys.exit(1)
     
     print(f"🔗 Webhook URL: {WEBHOOK_URL}")
     print(f"🔑 Using HMAC Key: {HMAC_KEY}")
@@ -159,7 +174,7 @@ def check_memory_storage():
     print("🧠 Verifying Memory Storage...")
     print("=" * 50)
     
-    CLIENT_DATA_URL = "https://8nv3jj2gie.execute-api.us-east-1.amazonaws.com/Prod/client-data"
+    CLIENT_DATA_URL = "https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data"
     WORKSPACE_KEY = "wsec_eb779969b7cb5cde6cdd9c6dfc4e2a08fa38cd6711b86eced6c101039871f6ac"
     
     test_callers = ["+14155551234", "+16129782029"]
