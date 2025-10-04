@@ -1,1136 +1,2269 @@
-# Eleven Labs Agentic Memory
+# ElevenLabs Agentic Memory# Eleven Labs Agentic Memory
 
 
+
+> **Production-Ready Conversational Memory System**  
+
+> AWS Serverless Backend for ElevenLabs Voice Agents with Mem0 Cloud Integration
 
 **Conversational Memory for ElevenLabs Voice Agents**
 
+[![AWS SAM](https://img.shields.io/badge/AWS%20SAM-Serverless-orange)](https://aws.amazon.com/serverless/sam/)
 
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/)
 
-Eleven Labs Agentic Memory is an AWS serverless backend that provides persistent memory capabilities for ElevenLabs voice agents using Mem0 Cloud. It enables agents to remember previous conversations and provide personalized interactions.
+[![Mem0](https://img.shields.io/badge/Mem0-Cloud-green)](https://mem0.ai/)
 
-
-
-## Table of ContentsEleven Labs Agentic Memory is an AWS serverless backend that provides persistent memory capabilities for ElevenLabs voice agents using Mem0 Cloud. It enables agents to remember previous conversations and provide personalized interactions.> **Conversational Memory for ElevenLabs Voice Agents****Production-Ready AWS Serverless Backend** for ElevenLabs Voice Agents with Mem0 Cloud integration for conversational memory management.
-
-
-
-1. [🚀 Quick Start](#-quick-start)
-
-2. [🏗️ Architecture](#️-architecture)  
-
-3. [🔐 Authentication (CRITICAL)](#-authentication-critical)## Table of Contents
-
-4. [📋 System Components](#-system-components)
-
-5. [🧠 Memory System](#-memory-system)
-
-6. [🎤 ElevenLabs Integration](#-elevenlabs-integration)
-
-7. [☁️ AWS Infrastructure](#️-aws-infrastructure)1. [🚀 Quick Start](#-quick-start)Eleven Labs Agentic Memory is an AWS serverless backend that provides persistent memory capabilities for ElevenLabs voice agents using Mem0 Cloud. It enables agents to remember previous conversations and provide personalized interactions.[![AWS SAM](https://img.shields.io/badge/AWS%20SAM-Serverless-orange)](https://aws.amazon.com/serverless/sam/)
-
-8. [🛠️ Development Workflow](#️-development-workflow)
-
-9. [🧪 Testing](#-testing)2. [🏗️ Architecture](#️-architecture)  
-
-10. [🔍 Troubleshooting](#-troubleshooting)
-
-11. [📂 Project Structure](#-project-structure)3. [🔐 Authentication (CRITICAL)](#-authentication-critical)[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/)
-
-12. [🤖 System Prompt Template](#-system-prompt-template)
-
-4. [📋 System Components](#-system-components)
-
----
-
-5. [🧠 Memory System](#-memory-system)## 🚀 Quick Start[![Mem0](https://img.shields.io/badge/Mem0-Cloud-green)](https://mem0.ai/)
-
-## 🚀 Quick Start
-
-6. [🎤 ElevenLabs Integration](#-elevenlabs-integration)
-
-### 1. Deploy the Backend
-
-```bash7. [☁️ AWS Infrastructure](#️-aws-infrastructure)[![ElevenLabs](https://img.shields.io/badge/ElevenLabs-Voice%20AI-purple)](https://elevenlabs.io/)
-
-# Build dependencies
-
-cd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..8. [🛠️ Development Workflow](#️-development-workflow)
+[![ElevenLabs](https://img.shields.io/badge/ElevenLabs-Voice%20AI-purple)](https://elevenlabs.io/)Eleven Labs Agentic Memory is an AWS serverless backend that provides persistent memory capabilities for ElevenLabs voice agents using Mem0 Cloud. It enables agents to remember previous conversations and provide personalized interactions.
 
 
 
-# Deploy to AWS9. [🧪 Testing](#-testing)### 1. Deploy the Backend
-
-sam build && sam deploy --guided
-
-```10. [🔍 Troubleshooting](#-troubleshooting)
+**Last Updated**: October 3, 2025
 
 
 
-### 2. Configure ElevenLabs11. [📂 Project Structure](#-project-structure)```bash## Overview
-
-- **Conversation Initiation Webhook**: Set URL and authentication via secrets manager
-
-- **Search Memory Tool**: Configure for in-call memory retrieval  12. [🤖 System Prompt Template](#-system-prompt-template)
-
-- **Post-Call Webhook**: Enable for memory storage with HMAC authentication
-
-# Build dependencies
-
-### 3. Test the System
-
-```bash---
-
-python3 scripts/test_production_ready.py
-
-```cd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..This system bridges **ElevenLabs voice agents** with **Mem0 Cloud** for persistent conversational memory across calls. Three optimized Lambda functions handle the complete memory lifecycle:
+---## Table of ContentsEleven Labs Agentic Memory is an AWS serverless backend that provides persistent memory capabilities for ElevenLabs voice agents using Mem0 Cloud. It enables agents to remember previous conversations and provide personalized interactions.> **Conversational Memory for ElevenLabs Voice Agents****Production-Ready AWS Serverless Backend** for ElevenLabs Voice Agents with Mem0 Cloud integration for conversational memory management.
 
 
 
----## 🚀 Quick Start
+## 📖 Table of Contents
 
 
 
-## 🏗️ Architecture
+1. [Overview](#overview)1. [🚀 Quick Start](#-quick-start)
+
+2. [🚀 Quick Start](#-quick-start)
+
+3. [🏗️ Architecture](#️-architecture)2. [🏗️ Architecture](#️-architecture)  
+
+4. [🔐 Authentication](#-authentication)
+
+5. [📋 System Components](#-system-components)3. [🔐 Authentication (CRITICAL)](#-authentication-critical)## Table of Contents
+
+6. [🧠 Memory System](#-memory-system)
+
+7. [🎤 ElevenLabs Integration](#-elevenlabs-integration)4. [📋 System Components](#-system-components)
+
+8. [☁️ S3 Storage](#️-s3-storage)
+
+9. [🎵 Audio Webhook Handling](#-audio-webhook-handling)5. [🧠 Memory System](#-memory-system)
+
+10. [🛠️ Development](#️-development)
+
+11. [🧪 Testing](#-testing)6. [🎤 ElevenLabs Integration](#-elevenlabs-integration)
+
+12. [🔍 Troubleshooting](#-troubleshooting)
+
+13. [📂 Project Structure](#-project-structure)7. [☁️ AWS Infrastructure](#️-aws-infrastructure)1. [🚀 Quick Start](#-quick-start)Eleven Labs Agentic Memory is an AWS serverless backend that provides persistent memory capabilities for ElevenLabs voice agents using Mem0 Cloud. It enables agents to remember previous conversations and provide personalized interactions.[![AWS SAM](https://img.shields.io/badge/AWS%20SAM-Serverless-orange)](https://aws.amazon.com/serverless/sam/)
 
 
 
-```### 1. Deploy the Backend
+---8. [🛠️ Development Workflow](#️-development-workflow)
 
-ElevenLabs Agent ←→ AWS Lambda Functions ←→ Mem0 Cloud
 
-                         ↓```bash# Deploy to AWS1. **ClientData** (Pre-call): Returns personalized memory context when conversation starts
 
-                   S3 Storage (backup)
+## Overview9. [🧪 Testing](#-testing)2. [🏗️ Architecture](#️-architecture)  
+
+
+
+**ElevenLabs Agentic Memory** is a production-ready AWS serverless backend that provides persistent memory capabilities for ElevenLabs voice agents using Mem0 Cloud. It enables agents to:10. [🔍 Troubleshooting](#-troubleshooting)
+
+
+
+- 🎯 **Remember** previous conversations across multiple calls11. [📂 Project Structure](#-project-structure)3. [🔐 Authentication (CRITICAL)](#-authentication-critical)[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/)
+
+- 🤝 **Personalize** greetings based on caller history  
+
+- 🔍 **Search** past conversations during active calls12. [🤖 System Prompt Template](#-system-prompt-template)
+
+- 📊 **Store** both factual summaries and full conversation transcripts
+
+- 🎵 **Archive** complete call recordings with metadata4. [📋 System Components](#-system-components)
+
+
+
+### Key Features---
+
+
+
+- ⚡ **Sub-500ms latency** with separate HTTP APIs per function5. [🧠 Memory System](#-memory-system)## 🚀 Quick Start[![Mem0](https://img.shields.io/badge/Mem0-Cloud-green)](https://mem0.ai/)
+
+- 🔐 **Production security** with HMAC signatures and workspace key authentication
+
+- 🧠 **Smart memory separation** between factual data and conversation context## 🚀 Quick Start
+
+- 📊 **Comprehensive S3 archival** for all webhook payloads and responses
+
+- 🔄 **Dual webhook support** for separate transcription and audio delivery6. [🎤 ElevenLabs Integration](#-elevenlabs-integration)
+
+- 🎤 **Real-time monitoring** with CloudWatch integration
+
+- 🚀 **Async processing** to prevent webhook timeouts### 1. Deploy the Backend
+
+
+
+### System Architecture```bash7. [☁️ AWS Infrastructure](#️-aws-infrastructure)[![ElevenLabs](https://img.shields.io/badge/ElevenLabs-Voice%20AI-purple)](https://elevenlabs.io/)
+
+
 
 ```# Build dependencies
 
+┌─────────────────┐
 
+│  ElevenLabs     │cd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..8. [🛠️ Development Workflow](#️-development-workflow)
 
-**3 Lambda Functions**:cd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..sam build && sam deploy --guided2. **Retrieve** (Mid-call): Semantic search for agent tools during active conversations  
+│  Voice Agent    │
 
-- **ClientData**: Pre-call memory retrieval + personalized greeting
+└────────┬────────┘
 
-- **PostCall**: Async memory storage after calls
+         │
 
-- **Retrieve**: In-call semantic search tool
+         ├──── Pre-Call ───────► ClientData Lambda ────► Mem0 Cloud# Deploy to AWS9. [🧪 Testing](#-testing)### 1. Deploy the Backend
 
-# Deploy to AWS```3. **PostCall** (Async): Stores factual and semantic memories after call completion
+         │                       (Memory Retrieval)      (Get History)
 
----
+         │sam build && sam deploy --guided
 
-sam build && sam deploy --guided
+         ├──── Mid-Call ───────► Retrieve Lambda ──────► Mem0 Cloud
 
-## 🔐 Authentication (CRITICAL)
+         │                       (Semantic Search)       (Search Memories)```10. [🔍 Troubleshooting](#-troubleshooting)
+
+         │
+
+         └──── Post-Call ──────► PostCall Lambda ──────► Mem0 Cloud
+
+                                 (Memory Storage)        (Store New Data)
+
+                                       │### 2. Configure ElevenLabs11. [📂 Project Structure](#-project-structure)```bash## Overview
+
+                                       └─────────────────► S3 Storage
+
+                                                          (Archive)- **Conversation Initiation Webhook**: Set URL and authentication via secrets manager
 
 ```
 
-### ⚠️ DO NOT CHANGE THESE AUTHENTICATION METHODS
+- **Search Memory Tool**: Configure for in-call memory retrieval  12. [🤖 System Prompt Template](#-system-prompt-template)
+
+---
+
+- **Post-Call Webhook**: Enable for memory storage with HMAC authentication
+
+## 🚀 Quick Start
+
+# Build dependencies
+
+### Prerequisites
+
+### 3. Test the System
+
+- AWS Account with CLI configured
+
+- AWS SAM CLI installed```bash---
+
+- Python 3.12+
+
+- ElevenLabs accountpython3 scripts/test_production_ready.py
+
+- Mem0 Cloud account
+
+```cd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..This system bridges **ElevenLabs voice agents** with **Mem0 Cloud** for persistent conversational memory across calls. Three optimized Lambda functions handle the complete memory lifecycle:
+
+### 1. Deploy the Backend
 
 
-
-#### ClientData Authentication
-
-**Method**: ElevenLabs Secrets Manager (NOT direct headers)### 2. Configure ElevenLabs### 2. Configure ElevenLabs**✨ Key Features:**
-
-
-
-**Configuration**:- **Conversation Initiation Webhook**: Set URL and authentication via secrets manager
-
-1. Go to [ElevenLabs Settings](https://elevenlabs.io/app/agents/settings)
-
-2. Add secret: `WORKSPACE_KEY` = `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`- **Search Memory Tool**: Configure for in-call memory retrieval  - **Conversation Initiation Webhook**: Set URL and authentication via secrets manager- 🚀 **Sub-500ms latency** with separate HTTP APIs per function
-
-3. Map to header: `X-Workspace-Key` → `WORKSPACE_KEY` secret
-
-4. Enable in agent Security tab: "Fetch conversation initiation data"- **Post-Call Webhook**: Enable for memory storage with HMAC authentication
-
-
-
-**Why**: ElevenLabs requires authentication headers to be managed through their secure secrets interface, not as direct header configuration.- **Search Memory Tool**: Configure for in-call memory retrieval  - 🔐 **Production security** with HMAC signatures and workspace key auth
-
-
-
-#### PostCall Authentication### 3. Test the System
-
-**Method**: HMAC-SHA256 Signature
-
-```bash- **Post-Call Webhook**: Enable for memory storage with HMAC authentication- 🧠 **Smart memory separation** between factual data and conversation context
-
-**Reference**: https://elevenlabs.io/docs/agents-platform/workflows/post-call-webhooks#authentication
-
-python3 scripts/test_production_ready.py
-
-**Configuration**:
-
-- HMAC Key: `wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3````- 📊 **Real-time monitoring** with CloudWatch integration
-
-- Header: `ElevenLabs-Signature` (format: `t=timestamp,v0=signature`)
-
-- Tolerance: 30 minutes
-
-- Always return 200 OK (async processing)
-
----### 3. Test the System- 🔄 **Async processing** to prevent webhook timeouts
-
-**Why**: ElevenLabs uses HMAC signatures to verify webhook authenticity and prevent replay attacks.
-
-
-
-#### Retrieve Authentication  
-
-**Method**: None (trusted connection)## 🏗️ Architecture```bash- ⚡ **Optimized performance** with Lambda layer reuse
-
-
-
-**Configuration**: No authentication required
-
-
-
-**Why**: Direct communication between ElevenLabs agent and backend during active calls is considered trusted.```python3 scripts/test_production_ready.py
-
-
-
-### Quick Authentication TestElevenLabs Agent ←→ AWS Lambda Functions ←→ Mem0 Cloud
 
 ```bash
 
-# ClientData (should return 200 with memory data)                         ↓```## 📁 Project Structure
+# Clone the repository---## 🚀 Quick Start
 
-curl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
+git clone <repository-url>
 
-  -H 'X-Workspace-Key: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70' \                   S3 Storage (backup)
+cd AgenticMemory
 
-  -H 'Content-Type: application/json' \
 
-  -d '{"caller_id": "+16129782029"}' -v```
 
-
-
-# Test wrong key (should return 401)
-
-curl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
-
-  -H 'X-Workspace-Key: wrong_key' \**3 Lambda Functions**:## 📋 Complete Documentation```
-
-  -H 'Content-Type: application/json' \
-
-  -d '{"caller_id": "+16129782029"}' -s -w "Status: %{http_code}\n"- **ClientData**: Pre-call memory retrieval + personalized greeting
-
-```
-
-- **PostCall**: Async memory storage after callsAgenticMemory/
-
----
-
-- **Retrieve**: In-call semantic search tool
-
-## 📋 System Components
-
-**📖 [MASTER_DOCUMENTATION.md](MASTER_DOCUMENTATION.md)** - Complete project guide covering:├── src/                    # Lambda function source code
-
-### 1. ClientData Function (`src/client_data/handler.py`)
-
-**Purpose**: Pre-call memory retrieval + personalized greeting generation---
-
-
-
-**Endpoint**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`- Architecture overview and components│   ├── client_data/        # Pre-call memory retrieval
-
-
-
-**Request Format**:## 🔐 Authentication (CRITICAL)
-
-```json
-
-{- ElevenLabs integration setup│   ├── retrieve/           # Mid-call semantic search
-
-  "caller_id": "+16129782029",
-
-  "agent_id": "agent_xxx"### ⚠️ DO NOT CHANGE THESE AUTHENTICATION METHODS
-
-}
-
-```- Authentication methods (ClientData secrets + PostCall HMAC)│   └── post_call/          # Async memory storage
-
-
-
-**Response Format**:#### ClientData Authentication
-
-```json
-
-{**Method**: ElevenLabs Secrets Manager (NOT direct headers)- Memory system operation├── layer/                  # Shared Lambda layer (mem0ai)
-
-  "type": "conversation_initiation_client_data",
-
-  "dynamic_variables": {
-
-    "caller_id": "+16129782029",
-
-    "memory_count": "4",**Configuration**:- Troubleshooting and monitoring├── docs/                   # 📚 All documentation
-
-    "memory_summary": "User wants to update email address",
-
-    "returning_caller": "yes",1. Go to [ElevenLabs Settings](https://elevenlabs.io/app/agents/settings)
-
-    "caller_name": "Stefan"
-
-  },2. Add secret: `WORKSPACE_KEY` = `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`- Development workflow│   ├── README.md           # Documentation index
-
-  "conversation_config_override": {
-
-    "agent": {3. Map to header: `X-Workspace-Key` → `WORKSPACE_KEY` secret
-
-      "prompt": {"prompt": "CALLER CONTEXT: This caller has 4 previous interactions..."},
-
-      "first_message": "Hello Stefan! I know you prefer email updates. How can I assist you today?"4. Enable in agent Security tab: "Fetch conversation initiation data"│   ├── SPECIFICATION.md    # Technical spec
-
-    }
-
-  }
-
-}
-
-```**Why**: ElevenLabs requires authentication headers to be managed through their secure secrets interface, not as direct header configuration.**🔐 [AUTHENTICATION_REFERENCE.md](AUTHENTICATION_REFERENCE.md)** - Critical authentication setup│   ├── SYSTEM_FLOW.md      # Architecture diagrams
-
-
-
-### 2. PostCall Function (`src/post_call/handler.py`)
-
-**Purpose**: Async memory storage after call completion
-
-#### PostCall Authentication**🤖 [CORRECTED_MEMOIR_SYSTEM_PROMPT.md](CORRECTED_MEMOIR_SYSTEM_PROMPT.md)** - ElevenLabs system prompt│   ├── ELEVENLABS_SETUP_GUIDE.md
-
-**Endpoint**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`
-
-**Method**: HMAC-SHA256 Signature
-
-**Processing**: Stores both factual summaries and semantic transcripts to Mem0
-
-**📂 [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)** - File structure and quick commands│   ├── QUICK_REFERENCE.md
-
-### 3. Retrieve Function (`src/retrieve/handler.py`)  
-
-**Purpose**: In-call semantic search for memory retrieval**Reference**: https://elevenlabs.io/docs/agents-platform/workflows/post-call-webhooks#authentication
-
-
-
-**Endpoint**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`│   └── ... (see docs/README.md)
-
-
-
-**Tool Configuration** (ElevenLabs):**Configuration**:
-
-```json
-
-{- HMAC Key: `wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3`## 🏗️ Architecture├── scripts/                # 🧪 Test & utility scripts
-
-  "name": "search_memory",
-
-  "description": "Search previous conversations and memories",- Header: `ElevenLabs-Signature` (format: `t=timestamp,v0=signature`)
-
-  "parameters": {
-
-    "query": {"type": "string", "description": "What to search for"},- Tolerance: 30 minutes│   ├── README.md           # Scripts index
-
-    "user_id": {"type": "string", "default": "{{system__caller_id}}"}
-
-  }- Always return 200 OK (async processing)
-
-}
-
-``````│   ├── test_postcall_with_file.py  # ⭐ Main test tool
-
-
-
----**Why**: ElevenLabs uses HMAC signatures to verify webhook authenticity and prevent replay attacks.
-
-
-
-## 🧠 Memory SystemElevenLabs Agent ←→ AWS Lambda Functions ←→ Mem0 Cloud│   ├── test_postcall.sh    # Bash wrapper
-
-
-
-### Memory Types#### Retrieve Authentication  
-
-1. **Factual Memories** (`metadata.type = "factual"`)
-
-   - Call summaries and key facts**Method**: None (trusted connection)                         ↓│   └── ... (25+ test scripts)
-
-   - User preferences and account details
-
-   - Used for dynamic variables and context
-
-
-
-2. **Semantic Memories** (`metadata.type = "semantic"`)**Configuration**: No authentication required                   S3 Storage (backup)├── test_data/              # 📋 JSON test payloads
-
-   - Full conversation transcripts
-
-   - Used for semantic search during calls
-
-   - Enables detailed recall of past conversations
-
-**Why**: Direct communication between ElevenLabs agent and backend during active calls is considered trusted.```│   ├── README.md           # Test data index
-
-### Memory Storage Process
-
-1. **Call Ends** → ElevenLabs sends webhook to PostCall
-
-2. **Extract Content** → Parse transcript and analysis
-
-3. **Generate Summary** → Create factual memory from key points### Quick Authentication Test│   ├── conv_*.json         # Real conversation files
-
-4. **Store Both Types** → Save factual + semantic to Mem0
-
-5. **S3 Backup** → Store raw payload for audit trail```bash
-
-
-
-### Memory Retrieval Process# ClientData (should return 200 with memory data)**3 Lambda Functions**:│   └── *_payload.json      # Sample payloads
-
-1. **Call Starts** → ElevenLabs calls ClientData webhook
-
-2. **Get All Memories** → Retrieve factual + semantic for callercurl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
-
-3. **Extract Name** → Use regex patterns to find caller name
-
-4. **Generate Context** → Build personalized prompt override  -H 'X-Workspace-Key: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70' \- **ClientData**: Pre-call memory retrieval + personalized greeting├── tests/                  # Unit tests
-
-5. **Create Variables** → Populate dynamic variables for agent
-
-  -H 'Content-Type: application/json' \
-
-### Mem0 Cloud Configuration
-
-- **API Key**: `m0-gS2X0TszRwwEC6mXE3DrEDtpxQJdcCWAariVvafD`  -d '{"caller_id": "+16129782029"}' -v- **PostCall**: Async memory storage after calls├── template.yaml           # SAM deployment template
-
-- **Organization ID**: `org_knmmDKevT5Yz7bDF4Dd9BcFDWjp2RHzstpvtN3GW`
-
-- **Project ID**: `proj_3VBb1VIAmQofeGcY0XCHDbb7EqBLeEfETd6iNFqZ`
-
-- **User ID Format**: Phone numbers in E.164 format (`+16129782029`)
-
-# Test wrong key (should return 401)- **Retrieve**: In-call semantic search tool├── samconfig.toml          # SAM configuration (gitignored)
-
----
-
-curl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
-
-## 🎤 ElevenLabs Integration
-
-  -H 'X-Workspace-Key: wrong_key' \└── requirements.txt        # Dev dependencies
-
-### Agent Configuration Requirements
-
-  -H 'Content-Type: application/json' \
-
-#### 1. Conversation Initiation Webhook
-
-- **URL**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`  -d '{"caller_id": "+16129782029"}' -s -w "Status: %{http_code}\n"## ✅ Current Status```
-
-- **Method**: POST
-
-- **Authentication**: Secrets Manager (NOT direct headers)```
-
-- **Secret Name**: `WORKSPACE_KEY`
-
-- **Secret Value**: `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`
-
-- **Header Mapping**: `X-Workspace-Key` → `WORKSPACE_KEY` secret
-
----
-
-#### 2. Agent Security Settings
-
-Enable in agent's Security tab:- ✅ **Backend Deployed**: All 3 Lambda functions operational**Quick Navigation:**
-
-- ✅ "Fetch conversation initiation data for inbound Twilio calls"
-
-- ✅ Allow prompt overrides## 📋 System Components
-
-- ✅ Allow first message overrides
-
-- ✅ **Mem0 Integration**: Storing factual + semantic memories- 📖 **Documentation**: See [docs/README.md](docs/README.md)
-
-#### 3. Search Memory Tool
-
-- **URL**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`### 1. ClientData Function (`src/client_data/handler.py`)
-
-- **Method**: POST
-
-- **Authentication**: None**Purpose**: Pre-call memory retrieval + personalized greeting generation- ✅ **Authentication**: ElevenLabs secrets + HMAC configured- 🧪 **Testing**: See [scripts/README.md](scripts/README.md)  
-
-- **Parameters**: `query` (string), `user_id` (default: `{{system__caller_id}}`)
-
-
-
-#### 4. Post-Call Webhook
-
-- **URL**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`**Endpoint**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`- ✅ **Testing**: Production-ready endpoints verified- 📊 **Test Data**: See [test_data/README.md](test_data/README.md)
-
-- **Method**: POST
-
-- **Authentication**: HMAC signature (auto-configured by ElevenLabs)
-
-- **HMAC Secret**: `wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3`
-
-**Request Format**:- ✅ **Monitoring**: CloudWatch logs and error tracking
-
-### Dynamic Variables
-
-The system provides these variables for ElevenLabs agents:```json
-
-- `{{caller_id}}` - Phone number (+16129782029)
-
-- `{{returning_caller}}` - "yes" or "no"  {## Architecture
-
-- `{{caller_name}}` - Extracted name (e.g., "Stefan")
-
-- `{{memory_count}}` - Number of previous interactions  "caller_id": "+16129782029",
-
-- `{{memory_summary}}` - Most recent/important memory
-
-  "agent_id": "agent_xxx"## 🎯 Test User
-
----
-
-}
-
-## ☁️ AWS Infrastructure
-
-``````mermaid
-
-### CloudFormation Stack
-
-**Name**: `elevenlabs-agentic-memory-stack`
-
-**Region**: `us-east-1`
-
-**Response Format**:**Stefan** (`+16129782029`) has 4 stored memories and receives personalized greetings:graph TB
-
-### Lambda Functions
-
-- `elevenlabs-agentic-memory-lambda-function-client-data````json
-
-- `elevenlabs-agentic-memory-lambda-function-post-call`
-
-- `elevenlabs-agentic-memory-lambda-function-search-data`{> "Hello Stefan! I know you prefer email updates. How can I assist you today?"    A[ElevenLabs Agent] --> B[ClientData API]
-
-
-
-### API Gateway Endpoints  "type": "conversation_initiation_client_data",
-
-Each function has its own API Gateway for optimal performance:
-
-- ClientData: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`  "dynamic_variables": {    A --> C[Retrieve API] 
-
-- PostCall: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`
-
-- Retrieve: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`    "caller_id": "+16129782029",
-
-
-
-### S3 Storage    "memory_count": "4",## 🔗 Live Endpoints    A --> D[PostCall API]
-
-**Bucket**: `elevenlabs-agentic-memory-424875385161-us-east-1`
-
-**Purpose**: Backup storage for call data and audit trails    "memory_summary": "User wants to update email address",
-
-
-
-### CloudWatch Logs    "returning_caller": "yes",    
-
-**Retention**: 7 days
-
-**Log Groups**:    "caller_name": "Stefan"
-
-- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data`
-
-- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-post-call`  },- **ClientData**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`    B --> E[ClientData Lambda]
-
-- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-search-data`
-
-  "conversation_config_override": {
-
----
-
-    "agent": {- **PostCall**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`      C --> F[Retrieve Lambda]
-
-## 🛠️ Development Workflow
-
-      "prompt": {"prompt": "CALLER CONTEXT: This caller has 4 previous interactions..."},
-
-### Build & Deploy
-
-```bash      "first_message": "Hello Stefan! I know you prefer email updates. How can I assist you today?"- **Retrieve**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`    D --> G[PostCall Lambda]
-
-# 1. Build Lambda layer (required first)
-
-cd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..    }
-
-
-
-# 2. Build SAM application  }    
-
-sam build
-
-}
-
-# 3. Deploy
-
-sam deploy --guided  # First time```## 📞 Support    E --> H[Mem0 Cloud]
-
-sam deploy           # Subsequent deploys
-
-```
-
-
-
-### Monitoring### 2. PostCall Function (`src/post_call/handler.py`)    F --> H
-
-```bash
-
-# Tail logs**Purpose**: Async memory storage after call completion
-
-aws logs tail /aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data --follow
-
-For setup issues, see the troubleshooting section in `MASTER_DOCUMENTATION.md` or check CloudWatch logs:    G --> H
-
-# Check for errors
-
-aws logs filter-log-events --log-group-name "/aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data" --filter-pattern "ERROR"**Endpoint**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`
-
-```
-
-    
-
----
-
-**Processing**: Stores both factual summaries and semantic transcripts to Mem0
-
-## 🧪 Testing
-
-```bash    I[Lambda Layer<br/>mem0ai] --> E
-
-### Test Scripts
-
-```bash### 3. Retrieve Function (`src/retrieve/handler.py`)  
-
-# Test individual endpoints
-
-python3 scripts/test_clientdata.py**Purpose**: In-call semantic search for memory retrievalaws logs tail /aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data --follow    I --> F  
-
-python3 scripts/test_postcall.py
-
-python3 scripts/test_retrieve.py
-
-
-
-# Comprehensive test**Endpoint**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve````    I --> G
-
-python3 scripts/test_production_ready.py
-
-```
-
-
-
-### Test Data**Tool Configuration** (ElevenLabs):    
-
-- **Stefan** (`+16129782029`): Has 4 stored memories, receives personalized greetings
-
-- **New numbers**: No memories, tests first-time caller flow```json
-
-
-
-### Expected Results{---    J[CloudWatch Logs] --> E
-
-**Stefan's Greeting**: "Hello Stefan! I know you prefer email updates. How can I assist you today?"
-
-**New Caller**: "Hello! Welcome to our memoir interview service. Could you please tell me your name?"  "name": "search_memory",
-
-
-
----  "description": "Search previous conversations and memories",    J --> F
-
-
-
-## 🔍 Troubleshooting  "parameters": {
-
-
-
-### Common Issues    "query": {"type": "string", "description": "What to search for"},*Built with AWS SAM, ElevenLabs Agents Platform, and Mem0 Cloud*    J --> G
-
-
-
-#### 1. "Invalid workspace key" Error    "user_id": {"type": "string", "default": "{{system__caller_id}}"}```
-
-**Cause**: ElevenLabs secrets not configured properly
-
-**Fix**:   }
-
-1. Add `WORKSPACE_KEY` secret in ElevenLabs settings
-
-2. Map to `X-Workspace-Key` header in webhook config}**Infrastructure Components:**
-
-3. Verify agent has "fetch conversation initiation data" enabled
-
-```- 🏗️ **3 Lambda Functions** (Python 3.12, 256MB memory)
-
-#### 2. "Missing caller_id" Error  
-
-**Cause**: Webhook payload format incorrect- 🌐 **3 HTTP API Gateways** (separate for minimal routing latency)
-
-**Fix**: Ensure payload includes `{"caller_id": "{{system__caller_id}}"}`
-
----- 📦 **1 Shared Lambda Layer** (mem0ai package for reuse)
-
-#### 3. HMAC Signature Failures
-
-**Cause**: Wrong HMAC key or timestamp drift- 📊 **CloudWatch Logs** (7-day retention for cost optimization)
-
-**Fix**: Verify HMAC key matches ElevenLabs configuration
-
-## 🧠 Memory System- 🔧 **CloudFormation Stack** (Infrastructure as Code)
-
-#### 4. Memory Not Found
-
-**Cause**: User ID format mismatch
-
-**Fix**: Ensure phone numbers use E.164 format (+1XXXXXXXXXX)
-
-### Memory Types## Quick Start
-
-### Debug Commands
-
-```bash1. **Factual Memories** (`metadata.type = "factual"`)
-
-# Test endpoint manually
-
-curl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \   - Call summaries and key facts### Prerequisites Checklist
-
-  -H 'X-Workspace-Key: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70' \
-
-  -H 'Content-Type: application/json' \   - User preferences and account details
-
-  -d '{"caller_id": "+16129782029"}' -v
-
-   - Used for dynamic variables and context- ✅ **AWS CLI** configured with appropriate credentials
-
-# Check CloudWatch logs  
-
-aws logs tail /aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data --follow- ✅ **SAM CLI** installed ([Installation Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html))
-
-
-
-# Get conversation data from ElevenLabs2. **Semantic Memories** (`metadata.type = "semantic"`)- ✅ **Python 3.12** installed
-
-curl https://api.elevenlabs.io/v1/convai/conversations/{conversation_id} \
-
-  -H "xi-api-key: sk_1203631b4b7e9d5e06cc793713322c3788daff35da4d23bf"   - Full conversation transcripts- ✅ **Mem0 Account** with API credentials:
-
-```
-
-   - Used for semantic search during calls  - API Key (starts with `mem0-...`)
-
-**Debug Log Indicators**:
-
-- ✅ "Retrieving memories for user_id: +16129782029"   - Enables detailed recall of past conversations  - Organization ID (starts with `org_...`) 
-
-- ❌ "Invalid workspace key" (means ElevenLabs config wrong)
-
-- ❌ "Missing caller_id" (means payload format wrong)  - Project ID (starts with `proj_...`)
-
-
-
----### Memory Storage Process- ✅ **ElevenLabs Account** with webhook credentials:
-
-
-
-## 📂 Project Structure1. **Call Ends** → ElevenLabs sends webhook to PostCall  - Workspace Secret Key (starts with `wsec_...`)
-
-
-
-```2. **Extract Content** → Parse transcript and analysis  - HMAC Signing Key (for webhook verification)
-
-Eleven Labs Agentic Memory/
-
-├── README.md                          # 📋 This comprehensive guide3. **Generate Summary** → Create factual memory from key points
-
-├── template.yaml                      # ☁️ SAM CloudFormation template
-
-├── samconfig.toml                     # ⚙️ Deployment configuration (gitignored)4. **Store Both Types** → Save factual + semantic to Mem0## Project Structure
-
-├── requirements.txt                   # 🐍 Development dependencies
-
-├── .env                              # 🔐 Environment variables (gitignored)5. **S3 Backup** → Store raw payload for audit trail
-
-├── .gitignore                        # 📝 Git ignore rules
-
-│```
-
-├── src/                              # 💼 Lambda function source code
-
-│   ├── client_data/### Memory Retrieval ProcessAgenticMemory/
-
-│   │   └── handler.py                # 📞 Pre-call memory retrieval
-
-│   ├── post_call/1. **Call Starts** → ElevenLabs calls ClientData webhook├── 📄 SPECIFICATION.md           # Complete system specification
-
-│   │   └── handler.py                # 💾 Post-call memory storage
-
-│   └── retrieve/2. **Get All Memories** → Retrieve factual + semantic for caller├── 📖 README.md                  # Project documentation (this file)
-
-│       └── handler.py                # 🔍 In-call memory search
-
-│3. **Extract Name** → Use regex patterns to find caller name├── 🏗️ template.yaml              # SAM CloudFormation template
-
-├── layer/                            # 📦 Lambda layer dependencies
-
-│   ├── requirements.txt              # mem0ai package only4. **Generate Context** → Build personalized prompt override├── 📋 requirements.txt           # Development dependencies
-
-│   └── python/                       # Built dependencies
-
-│5. **Create Variables** → Populate dynamic variables for agent├── 🚫 .gitignore                 # Git ignore rules
-
-├── scripts/                          # 🧪 Testing and utilities
-
-│   ├── test_clientdata.py├── 🤖 .github/
-
-│   ├── test_postcall.py
-
-│   ├── test_retrieve.py### Mem0 Cloud Configuration│   └── copilot-instructions.md   # AI coding assistant guidelines
-
-│   ├── test_production_ready.py
-
-│   └── (other test scripts...)- **API Key**: `m0-gS2X0TszRwwEC6mXE3DrEDtpxQJdcCWAariVvafD`├── 📦 layer/
-
-│
-
-├── test_data/                        # 📊 Test payloads and data- **Organization ID**: `org_knmmDKevT5Yz7bDF4Dd9BcFDWjp2RHzstpvtN3GW`│   └── requirements.txt          # Lambda layer dependencies (mem0ai)
-
-│   └── elevenlabs_post_call_payload.json
-
-│- **Project ID**: `proj_3VBb1VIAmQofeGcY0XCHDbb7EqBLeEfETd6iNFqZ`├── 🧪 test_*.py                  # Authentication & webhook test scripts
-
-├── tests/                            # 🔬 Unit tests
-
-│   └── test_*.py- **User ID Format**: Phone numbers in E.164 format (`+16129782029`)└── 🔧 src/
-
-│
-
-├── docs/                            # 📚 Documentation    ├── client_data/
-
-│   └── archived/                    # 🗄️ Historical documentation
-
-│---    │   └── handler.py            # Pre-call memory retrieval
-
-└── .aws-sam/                       # 🏗️ SAM build artifacts (gitignored)
-
-```    ├── retrieve/
-
-
-
-### Essential Commands## 🎤 ElevenLabs Integration    │   └── handler.py            # Mid-call semantic search
-
-```bash
-
-# Deploy    └── post_call/
+# Build Lambda layer dependencies## 🏗️ Architecture
 
 cd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..
 
-sam build && sam deploy### Agent Configuration Requirements        └── handler.py            # Post-call memory storage
+
+
+# Build and deploy to AWS
+
+sam build```### 1. Deploy the Backend
+
+sam deploy --guided
+
+```ElevenLabs Agent ←→ AWS Lambda Functions ←→ Mem0 Cloud
 
 
 
-# Test```
+**During deployment**, provide:                         ↓```bash# Deploy to AWS1. **ClientData** (Pre-call): Returns personalized memory context when conversation starts
 
-python3 scripts/test_production_ready.py
+- Stack name (e.g., `agentic-memory-stack`)
 
-#### 1. Conversation Initiation Webhook
+- AWS Region                   S3 Storage (backup)
 
-# Monitor
+- Mem0 API credentials (API key, Org ID, Project ID)
 
-aws logs tail /aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data --follow- **URL**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`## ⚡ Deployment
+- ElevenLabs credentials (Workspace Key, HMAC Secret)```# Build dependencies
 
 
 
-# Debug- **Method**: POST
+**Save the API endpoints** from the deployment output:
 
-curl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
+- `ClientDataApiUrl`
 
-  -H 'X-Workspace-Key: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70' \- **Authentication**: Secrets Manager (NOT direct headers)> **💡 Tip**: The build process requires the Lambda layer to be built first since all functions depend on the shared mem0ai package.
+- `RetrieveApiUrl`**3 Lambda Functions**:cd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..sam build && sam deploy --guided2. **Retrieve** (Mid-call): Semantic search for agent tools during active conversations  
 
-  -H 'Content-Type: application/json' \
+- `PostCallApiUrl`
 
-  -d '{"caller_id": "+16129782029"}' -v- **Secret Name**: `WORKSPACE_KEY`
+- **ClientData**: Pre-call memory retrieval + personalized greeting
+
+### 2. Configure ElevenLabs
+
+- **PostCall**: Async memory storage after calls
+
+#### A. Conversation Initiation Webhook
+
+- **Retrieve**: In-call semantic search tool
+
+1. Go to [ElevenLabs Dashboard](https://elevenlabs.io/app/agents/settings) → Agent → Security
+
+2. Enable "Fetch conversation initiation data for inbound calls"# Deploy to AWS```3. **PostCall** (Async): Stores factual and semantic memories after call completion
+
+3. **Add Secret** in Secrets Manager:
+
+   - Name: `WORKSPACE_KEY`---
+
+   - Value: `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`
+
+4. **Configure Webhook**:sam build && sam deploy --guided
+
+   - URL: `<ClientDataApiUrl>` (from deployment output)
+
+   - Method: `POST`## 🔐 Authentication (CRITICAL)
+
+   - Header: `X-Workspace-Key` → `WORKSPACE_KEY` (secret reference)
 
 ```
 
-- **Secret Value**: `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`### Step 1: Build the Lambda Layer
+#### B. Search Memory Tool
 
----
+### ⚠️ DO NOT CHANGE THESE AUTHENTICATION METHODS
 
-- **Header Mapping**: `X-Workspace-Key` → `WORKSPACE_KEY` secret
+1. Go to Agent → Tools → Add Tool
 
-## 🤖 System Prompt Template
+2. Configure:
+
+   - Name: `search_memory`
+
+   - Description: "Search previous conversations for specific information"#### ClientData Authentication
+
+   - Type: Webhook
+
+   - URL: `<RetrieveApiUrl>`**Method**: ElevenLabs Secrets Manager (NOT direct headers)### 2. Configure ElevenLabs### 2. Configure ElevenLabs**✨ Key Features:**
+
+   - Method: `POST`
+
+   - Parameters:
+
+     - `query` (string): "What to search for"
+
+     - `user_id` (string, default: `{{system__caller_id}}`): "User identifier"**Configuration**:- **Conversation Initiation Webhook**: Set URL and authentication via secrets manager
+
+
+
+#### C. Post-Call Webhooks1. Go to [ElevenLabs Settings](https://elevenlabs.io/app/agents/settings)
+
+
+
+1. Go to Agent → Webhooks → Add Webhook2. Add secret: `WORKSPACE_KEY` = `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`- **Search Memory Tool**: Configure for in-call memory retrieval  - **Conversation Initiation Webhook**: Set URL and authentication via secrets manager- 🚀 **Sub-500ms latency** with separate HTTP APIs per function
+
+2. **Transcription Webhook**:
+
+   - Type: Conversation End3. Map to header: `X-Workspace-Key` → `WORKSPACE_KEY` secret
+
+   - URL: `<PostCallApiUrl>`
+
+   - Method: `POST`4. Enable in agent Security tab: "Fetch conversation initiation data"- **Post-Call Webhook**: Enable for memory storage with HMAC authentication
+
+   - Authentication: HMAC (use your HMAC secret)
+
+   - Enable "Send transcript data"
+
+3. **Audio Webhook** (enable separately):
+
+   - Enable "Send audio data" toggle**Why**: ElevenLabs requires authentication headers to be managed through their secure secrets interface, not as direct header configuration.- **Search Memory Tool**: Configure for in-call memory retrieval  - 🔐 **Production security** with HMAC signatures and workspace key auth
+
+   - Uses same endpoint and HMAC secret
+
+
+
+### 3. Test the System
+
+#### PostCall Authentication### 3. Test the System
 
 ```bash
 
-The following system prompt should be used in your ElevenLabs agent configuration:
+# Install test dependencies**Method**: HMAC-SHA256 Signature
 
-#### 2. Agent Security Settingscd layer
+pip install -r requirements.txt
 
-### ROLE IDENTITY
+```bash- **Post-Call Webhook**: Enable for memory storage with HMAC authentication- 🧠 **Smart memory separation** between factual data and conversation context
 
-You are a patient, empathetic Memoir Interviewer agent designed for personal storytelling. You are integrated with Eleven Labs Agentic Memory for long-term recall and personalization.Enable in agent's Security tab:mkdir -p python
+# Run comprehensive tests
+
+python3 test_production_ready.py**Reference**: https://elevenlabs.io/docs/agents-platform/workflows/post-call-webhooks#authentication
 
 
+
+# Or test individual componentspython3 scripts/test_production_ready.py
+
+python3 test_client_data_s3.py          # ClientData webhook + S3
+
+python3 test_audio_webhook.py           # Dual webhook system**Configuration**:
+
+python3 test_postcall_s3_path.py        # PostCall S3 paths
+
+```- HMAC Key: `wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3````- 📊 **Real-time monitoring** with CloudWatch integration
+
+
+
+---- Header: `ElevenLabs-Signature` (format: `t=timestamp,v0=signature`)
+
+
+
+## 🏗️ Architecture- Tolerance: 30 minutes
+
+
+
+### Lambda Functions- Always return 200 OK (async processing)
+
+
+
+Three specialized Lambda functions handle the complete memory lifecycle:---### 3. Test the System- 🔄 **Async processing** to prevent webhook timeouts
+
+
+
+#### 1. **ClientData** (Pre-Call Memory Retrieval)**Why**: ElevenLabs uses HMAC signatures to verify webhook authenticity and prevent replay attacks.
+
+
+
+**Purpose**: Retrieve caller's memory and generate personalized greeting before call starts
+
+
+
+**Trigger**: ElevenLabs Conversation Initiation webhook  #### Retrieve Authentication  
+
+**Authentication**: Workspace Key via ElevenLabs Secrets Manager  
+
+**Response Time**: < 500ms**Method**: None (trusted connection)## 🏗️ Architecture```bash- ⚡ **Optimized performance** with Lambda layer reuse
+
+
+
+**Flow**:
+
+1. Receive webhook with `caller_id`, `agent_id`, `called_number`, `call_sid`
+
+2. Query Mem0 for all memories associated with `caller_id`**Configuration**: No authentication required
+
+3. Extract caller name from memories (if available)
+
+4. Generate personalized greeting
+
+5. Format memory context for agent prompt
+
+6. Save request/response payloads to S3**Why**: Direct communication between ElevenLabs agent and backend during active calls is considered trusted.```python3 scripts/test_production_ready.py
+
+7. Return conversation config override to ElevenLabs
+
+
+
+**Key Functions**:
+
+- `extract_caller_name()`: Regex-based name extraction from memories### Quick Authentication TestElevenLabs Agent ←→ AWS Lambda Functions ←→ Mem0 Cloud
+
+- `generate_personalized_greeting()`: Creates customized greetings
+
+- `save_client_data_to_s3()`: Archives webhook data```bash
+
+
+
+#### 2. **Retrieve** (Mid-Call Semantic Search)# ClientData (should return 200 with memory data)                         ↓```## 📁 Project Structure
+
+
+
+**Purpose**: Semantic search of memories during active conversationscurl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
+
+
+
+**Trigger**: Agent tool invocation during call    -H 'X-Workspace-Key: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70' \                   S3 Storage (backup)
+
+**Authentication**: None (trusted agent connection)  
+
+**Response Time**: < 300ms  -H 'Content-Type: application/json' \
+
+
+
+**Flow**:  -d '{"caller_id": "+16129782029"}' -v```
+
+1. Receive search request with `query` and `user_id`
+
+2. Perform semantic search in Mem0
+
+3. Return top N relevant memories
+
+4. Agent uses results to inform conversation# Test wrong key (should return 401)
+
+
+
+**Use Cases**:curl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
+
+- "What did the caller say about email preferences?"
+
+- "When was their last purchase?"  -H 'X-Workspace-Key: wrong_key' \**3 Lambda Functions**:## 📋 Complete Documentation```
+
+- "What issues did they report?"
+
+  -H 'Content-Type: application/json' \
+
+#### 3. **PostCall** (Async Memory Storage)
+
+  -d '{"caller_id": "+16129782029"}' -s -w "Status: %{http_code}\n"- **ClientData**: Pre-call memory retrieval + personalized greeting
+
+**Purpose**: Store conversation memories and archive call data after completion
+
+```
+
+**Trigger**: ElevenLabs Post-Call webhooks (transcription + audio)  
+
+**Authentication**: HMAC-SHA256 signature  - **PostCall**: Async memory storage after callsAgenticMemory/
+
+**Processing**: Async (returns 200 OK immediately)
+
+---
+
+**Flow**:
+
+1. Verify HMAC signature- **Retrieve**: In-call semantic search tool
+
+2. Detect webhook type (`post_call_transcription` or `post_call_audio`)
+
+3. **For transcription webhook**:## 📋 System Components
+
+   - Extract conversation data
+
+   - Store factual memory (summary + evaluation)**📖 [MASTER_DOCUMENTATION.md](MASTER_DOCUMENTATION.md)** - Complete project guide covering:├── src/                    # Lambda function source code
+
+   - Store semantic memory (full transcript)
+
+   - Save JSON to S3### 1. ClientData Function (`src/client_data/handler.py`)
+
+4. **For audio webhook**:
+
+   - Decode base64 audio**Purpose**: Pre-call memory retrieval + personalized greeting generation---
+
+   - Save MP3 to S3
+
+5. Return success (errors logged but don't affect response)
+
+
+
+---**Endpoint**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`- Architecture overview and components│   ├── client_data/        # Pre-call memory retrieval
+
+
+
+## 🔐 Authentication
+
+
+
+### ⚠️ CRITICAL: Do Not Change These Methods**Request Format**:## 🔐 Authentication (CRITICAL)
+
+
+
+#### ClientData Authentication```json
+
+
+
+**Method**: ElevenLabs Secrets Manager (NOT direct headers){- ElevenLabs integration setup│   ├── retrieve/           # Mid-call semantic search
+
+
+
+**Configuration**:  "caller_id": "+16129782029",
+
+1. Add secret in ElevenLabs: `WORKSPACE_KEY` = `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`
+
+2. Map to header: `X-Workspace-Key` → `WORKSPACE_KEY` secret  "agent_id": "agent_xxx"### ⚠️ DO NOT CHANGE THESE AUTHENTICATION METHODS
+
+3. Enable in agent Security tab
+
+}
+
+**Why**: ElevenLabs requires authentication headers to be managed through their secure secrets interface for PCI compliance.
+
+```- Authentication methods (ClientData secrets + PostCall HMAC)│   └── post_call/          # Async memory storage
+
+#### PostCall Authentication
+
+
+
+**Method**: HMAC-SHA256 Signature
+
+**Response Format**:#### ClientData Authentication
+
+**Details**:
+
+- **HMAC Key**: `wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3````json
+
+- **Header**: `ElevenLabs-Signature`
+
+- **Format**: `t=<timestamp>,v0=<signature>`{**Method**: ElevenLabs Secrets Manager (NOT direct headers)- Memory system operation├── layer/                  # Shared Lambda layer (mem0ai)
+
+- **Signed Payload**: `{timestamp}.{raw_body}`
+
+- **Tolerance**: 30 minutes  "type": "conversation_initiation_client_data",
+
+- **Reference**: [ElevenLabs Webhook Authentication](https://elevenlabs.io/docs/agents-platform/workflows/post-call-webhooks#authentication)
+
+  "dynamic_variables": {
+
+**Why**: Prevents replay attacks and verifies webhook authenticity.
+
+    "caller_id": "+16129782029",
+
+#### Retrieve Authentication
+
+    "memory_count": "4",**Configuration**:- Troubleshooting and monitoring├── docs/                   # 📚 All documentation
+
+**Method**: None (trusted connection)
+
+    "memory_summary": "User wants to update email address",
+
+**Why**: Direct agent-to-backend communication during active calls is considered trusted.
+
+    "returning_caller": "yes",1. Go to [ElevenLabs Settings](https://elevenlabs.io/app/agents/settings)
+
+### Quick Authentication Test
+
+    "caller_name": "Stefan"
+
+```bash
+
+# Test ClientData (should return 200 with memory data)  },2. Add secret: `WORKSPACE_KEY` = `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`- Development workflow│   ├── README.md           # Documentation index
+
+curl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
+
+  -H 'X-Workspace-Key: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70' \  "conversation_config_override": {
+
+  -H 'Content-Type: application/json' \
+
+  -d '{"caller_id": "+16129782029", "agent_id": "agent_xyz", "called_number": "+17205752470", "call_sid": "CAtest"}'    "agent": {3. Map to header: `X-Workspace-Key` → `WORKSPACE_KEY` secret
+
+
+
+# Test PostCall (basic connectivity - HMAC signature required for real webhooks)      "prompt": {"prompt": "CALLER CONTEXT: This caller has 4 previous interactions..."},
+
+curl -X POST https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call \
+
+  -H 'Content-Type: application/json' \      "first_message": "Hello Stefan! I know you prefer email updates. How can I assist you today?"4. Enable in agent Security tab: "Fetch conversation initiation data"│   ├── SPECIFICATION.md    # Technical spec
+
+  -d '{"test": "connectivity"}'
+
+    }
+
+# Test Retrieve (no auth needed)
+
+curl -X POST https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve \  }
+
+  -H 'Content-Type: application/json' \
+
+  -d '{"query": "email preferences", "user_id": "+16129782029"}'}
+
+```
+
+```**Why**: ElevenLabs requires authentication headers to be managed through their secure secrets interface, not as direct header configuration.**🔐 [AUTHENTICATION_REFERENCE.md](AUTHENTICATION_REFERENCE.md)** - Critical authentication setup│   ├── SYSTEM_FLOW.md      # Architecture diagrams
+
+---
+
+
+
+## 📋 System Components
+
+### 2. PostCall Function (`src/post_call/handler.py`)
+
+### AWS Resources
+
+**Purpose**: Async memory storage after call completion
+
+| Resource | Purpose | Configuration |
+
+|----------|---------|---------------|#### PostCall Authentication**🤖 [CORRECTED_MEMOIR_SYSTEM_PROMPT.md](CORRECTED_MEMOIR_SYSTEM_PROMPT.md)** - ElevenLabs system prompt│   ├── ELEVENLABS_SETUP_GUIDE.md
+
+| **Lambda Functions** | Core processing logic | Python 3.12, 128-512MB RAM, 30-60s timeout |
+
+| **API Gateway (HTTP)** | Webhook endpoints | One per function, CORS enabled |**Endpoint**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`
+
+| **Lambda Layer** | Shared dependencies | Contains `mem0ai` package only |
+
+| **S3 Bucket** | Data archival | 7-day lifecycle policy on logs |**Method**: HMAC-SHA256 Signature
+
+| **CloudWatch Logs** | Monitoring & debugging | 7-day retention |
+
+| **IAM Roles** | Permissions | Scoped to minimum required |**Processing**: Stores both factual summaries and semantic transcripts to Mem0
+
+
+
+### Mem0 Cloud Integration**📂 [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)** - File structure and quick commands│   ├── QUICK_REFERENCE.md
+
+
+
+**API Endpoints Used**:### 3. Retrieve Function (`src/retrieve/handler.py`)  
+
+- `client.get_all(user_id)` - Retrieve all memories (ClientData)
+
+- `client.search(query, user_id, limit)` - Semantic search (Retrieve)**Purpose**: In-call semantic search for memory retrieval**Reference**: https://elevenlabs.io/docs/agents-platform/workflows/post-call-webhooks#authentication
+
+- `client.add(messages, user_id, metadata)` - Store memories (PostCall)
+
+
+
+**Memory Metadata**:
+
+```python**Endpoint**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`│   └── ... (see docs/README.md)
+
+{
+
+    'type': 'factual' | 'semantic',
+
+    'agent_id': 'agent_xyz',
+
+    'conversation_id': 'conv_abc123',**Tool Configuration** (ElevenLabs):**Configuration**:
+
+    'timestamp': '2025-10-03T12:34:56',
+
+    'call_duration_seconds': 180```json
+
+}
+
+```{- HMAC Key: `wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3`## 🏗️ Architecture├── scripts/                # 🧪 Test & utility scripts
+
+
+
+---  "name": "search_memory",
+
+
+
+## 🧠 Memory System  "description": "Search previous conversations and memories",- Header: `ElevenLabs-Signature` (format: `t=timestamp,v0=signature`)
+
+
+
+### Two Memory Types  "parameters": {
+
+
+
+#### 1. Factual Memory    "query": {"type": "string", "description": "What to search for"},- Tolerance: 30 minutes│   ├── README.md           # Scripts index
+
+
+
+**Purpose**: High-level summaries and key facts      "user_id": {"type": "string", "default": "{{system__caller_id}}"}
+
+**Source**: ElevenLabs analysis and evaluation  
+
+**Storage**: Mem0 Cloud with `metadata.type = "factual"`  }- Always return 200 OK (async processing)
+
+
+
+**Content**:}
+
+- Call summary
+
+- Key topics discussed``````│   ├── test_postcall_with_file.py  # ⭐ Main test tool
+
+- Caller preferences
+
+- Action items
+
+- Evaluation rationale
+
+---**Why**: ElevenLabs uses HMAC signatures to verify webhook authenticity and prevent replay attacks.
+
+**Example**:
+
+```json
+
+{
+
+  "user_id": "+16129782029",## 🧠 Memory SystemElevenLabs Agent ←→ AWS Lambda Functions ←→ Mem0 Cloud│   ├── test_postcall.sh    # Bash wrapper
+
+  "content": "Stefan wants to upgrade to premium account. Prefers email communication.",
+
+  "metadata": {
+
+    "type": "factual",
+
+    "agent_id": "agent_xyz",### Memory Types#### Retrieve Authentication  
+
+    "conversation_id": "conv_001"
+
+  }1. **Factual Memories** (`metadata.type = "factual"`)
+
+}
+
+```   - Call summaries and key facts**Method**: None (trusted connection)                         ↓│   └── ... (25+ test scripts)
+
+
+
+#### 2. Semantic Memory   - User preferences and account details
+
+
+
+**Purpose**: Full conversation transcripts for deep context     - Used for dynamic variables and context
+
+**Source**: Complete conversation messages array  
+
+**Storage**: Mem0 Cloud with `metadata.type = "semantic"`
+
+
+
+**Content**:2. **Semantic Memories** (`metadata.type = "semantic"`)**Configuration**: No authentication required                   S3 Storage (backup)├── test_data/              # 📋 JSON test payloads
+
+- Full conversation transcript
+
+- Speaker labels (agent/user)   - Full conversation transcripts
+
+- Timestamps per message
+
+- Raw conversation flow   - Used for semantic search during calls
+
+
+
+**Example**:   - Enables detailed recall of past conversations
+
+```json
+
+{**Why**: Direct communication between ElevenLabs agent and backend during active calls is considered trusted.```│   ├── README.md           # Test data index
+
+  "user_id": "+16129782029",
+
+  "messages": [### Memory Storage Process
+
+    {"role": "agent", "content": "Hello! How can I help?"},
+
+    {"role": "user", "content": "I want to upgrade my account"},1. **Call Ends** → ElevenLabs sends webhook to PostCall
+
+    {"role": "agent", "content": "Great! Let me help you with that..."}
+
+  ],2. **Extract Content** → Parse transcript and analysis
+
+  "metadata": {
+
+    "type": "semantic",3. **Generate Summary** → Create factual memory from key points### Quick Authentication Test│   ├── conv_*.json         # Real conversation files
+
+    "agent_id": "agent_xyz",
+
+    "conversation_id": "conv_001"4. **Store Both Types** → Save factual + semantic to Mem0
+
+  }
+
+}5. **S3 Backup** → Store raw payload for audit trail```bash
+
+```
+
+
+
+### Memory Lifecycle
+
+### Memory Retrieval Process# ClientData (should return 200 with memory data)**3 Lambda Functions**:│   └── *_payload.json      # Sample payloads
+
+```
+
+1. Call Starts1. **Call Starts** → ElevenLabs calls ClientData webhook
+
+   ↓
+
+2. ClientData retrieves ALL memories (factual + semantic)2. **Get All Memories** → Retrieve factual + semantic for callercurl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
+
+   ↓
+
+3. Agent personalizes greeting and conversation3. **Extract Name** → Use regex patterns to find caller name
+
+   ↓
+
+4. During call: Agent uses Retrieve for specific searches4. **Generate Context** → Build personalized prompt override  -H 'X-Workspace-Key: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70' \- **ClientData**: Pre-call memory retrieval + personalized greeting├── tests/                  # Unit tests
+
+   ↓
+
+5. Call Ends5. **Create Variables** → Populate dynamic variables for agent
+
+   ↓
+
+6. PostCall stores:  -H 'Content-Type: application/json' \
+
+   - Factual memory (summary + evaluation)
+
+   - Semantic memory (full transcript)### Mem0 Cloud Configuration
+
+   ↓
+
+7. Available for next call- **API Key**: `m0-gS2X0TszRwwEC6mXE3DrEDtpxQJdcCWAariVvafD`  -d '{"caller_id": "+16129782029"}' -v- **PostCall**: Async memory storage after calls├── template.yaml           # SAM deployment template
+
+```
+
+- **Organization ID**: `org_knmmDKevT5Yz7bDF4Dd9BcFDWjp2RHzstpvtN3GW`
+
+### User ID Format
+
+- **Project ID**: `proj_3VBb1VIAmQofeGcY0XCHDbb7EqBLeEfETd6iNFqZ`
+
+**Format**: E.164 phone numbers with `+` prefix  
+
+**Example**: `+16129782029`- **User ID Format**: Phone numbers in E.164 format (`+16129782029`)
+
+
+
+**Why**: Phone numbers serve as natural, unique identifiers for callers.# Test wrong key (should return 401)- **Retrieve**: In-call semantic search tool├── samconfig.toml          # SAM configuration (gitignored)
+
+
+
+------
+
+
+
+## 🎤 ElevenLabs Integrationcurl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
+
+
+
+### Webhook Payloads## 🎤 ElevenLabs Integration
+
+
+
+#### Conversation Initiation (ClientData)  -H 'X-Workspace-Key: wrong_key' \└── requirements.txt        # Dev dependencies
+
+
+
+**Request from ElevenLabs**:### Agent Configuration Requirements
+
+```json
+
+{  -H 'Content-Type: application/json' \
+
+  "caller_id": "+16129782029",
+
+  "agent_id": "agent_4301k6n146bgfs2tqtq5nhejw0r7",#### 1. Conversation Initiation Webhook
+
+  "called_number": "+17205752470",
+
+  "call_sid": "CA1234567890abcdef"- **URL**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`  -d '{"caller_id": "+16129782029"}' -s -w "Status: %{http_code}\n"## ✅ Current Status```
+
+}
+
+```- **Method**: POST
+
+
+
+**Response to ElevenLabs**:- **Authentication**: Secrets Manager (NOT direct headers)```
+
+```json
+
+{- **Secret Name**: `WORKSPACE_KEY`
+
+  "type": "conversation_initiation_client_data",
+
+  "dynamic_variables": {- **Secret Value**: `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`
+
+    "caller_id": "+16129782029",
+
+    "caller_name": "Stefan",- **Header Mapping**: `X-Workspace-Key` → `WORKSPACE_KEY` secret
+
+    "memory_count": "4",
+
+    "returning_caller": "yes",---
+
+    "memory_summary": "User wants to update email address"
+
+  },#### 2. Agent Security Settings
+
+  "conversation_config_override": {
+
+    "agent": {Enable in agent's Security tab:- ✅ **Backend Deployed**: All 3 Lambda functions operational**Quick Navigation:**
+
+      "prompt": {
+
+        "prompt": "CALLER CONTEXT:\nThis caller has 4 previous interactions...\n\nKnown information:\n- Stefan wants to upgrade to premium account\n- User Name is Stefan\n- Prefers email communication\n\nInstructions: Use this context naturally in conversation."- ✅ "Fetch conversation initiation data for inbound Twilio calls"
+
+      },
+
+      "first_message": "Hello Stefan! I know you prefer email updates. How can I assist you today?"- ✅ Allow prompt overrides## 📋 System Components
+
+    }
+
+  }- ✅ Allow first message overrides
+
+}
+
+```- ✅ **Mem0 Integration**: Storing factual + semantic memories- 📖 **Documentation**: See [docs/README.md](docs/README.md)
+
+
+
+#### Post-Call Transcription Webhook#### 3. Search Memory Tool
+
+
+
+**Request from ElevenLabs**:- **URL**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`### 1. ClientData Function (`src/client_data/handler.py`)
+
+```json
+
+{- **Method**: POST
+
+  "type": "post_call_transcription",
+
+  "event_timestamp": 1739537297,- **Authentication**: None**Purpose**: Pre-call memory retrieval + personalized greeting generation- ✅ **Authentication**: ElevenLabs secrets + HMAC configured- 🧪 **Testing**: See [scripts/README.md](scripts/README.md)  
+
+  "data": {
+
+    "agent_id": "agent_xyz",- **Parameters**: `query` (string), `user_id` (default: `{{system__caller_id}}`)
+
+    "conversation_id": "conv_abc123",
+
+    "external_number": "+16129782029",
+
+    "transcript": [
+
+      {"role": "agent", "message": "Hello! How can I help?", "timestamp": 1739537100},#### 4. Post-Call Webhook
+
+      {"role": "user", "message": "I want to upgrade", "timestamp": 1739537105}
+
+    ],- **URL**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`**Endpoint**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`- ✅ **Testing**: Production-ready endpoints verified- 📊 **Test Data**: See [test_data/README.md](test_data/README.md)
+
+    "analysis": {
+
+      "call_successful": true,- **Method**: POST
+
+      "transcript_summary": "Customer requested account upgrade...",
+
+      "custom_analysis_data": {}- **Authentication**: HMAC signature (auto-configured by ElevenLabs)
+
+    },
+
+    "metadata": {- **HMAC Secret**: `wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3`
+
+      "call_duration_seconds": 180,
+
+      "call_successful": true**Request Format**:- ✅ **Monitoring**: CloudWatch logs and error tracking
+
+    }
+
+  }### Dynamic Variables
+
+}
+
+```The system provides these variables for ElevenLabs agents:```json
+
+
+
+**Response** (immediate):- `{{caller_id}}` - Phone number (+16129782029)
+
+```json
+
+{- `{{returning_caller}}` - "yes" or "no"  {## Architecture
+
+  "status": "ok"
+
+}- `{{caller_name}}` - Extracted name (e.g., "Stefan")
+
+```
+
+- `{{memory_count}}` - Number of previous interactions  "caller_id": "+16129782029",
+
+#### Post-Call Audio Webhook
+
+- `{{memory_summary}}` - Most recent/important memory
+
+**Request from ElevenLabs**:
+
+```json  "agent_id": "agent_xxx"## 🎯 Test User
+
+{
+
+  "type": "post_call_audio",---
+
+  "event_timestamp": 1739537319,
+
+  "data": {}
+
+    "agent_id": "agent_xyz",
+
+    "conversation_id": "conv_abc123",## ☁️ AWS Infrastructure
+
+    "full_audio": "SUQzBAAAAAAA...base64_encoded_mp3...AAAA=="
+
+  }``````mermaid
+
+}
+
+```### CloudFormation Stack
+
+
+
+**Note**: Audio webhook contains ONLY audio data - no transcript or caller_id!**Name**: `elevenlabs-agentic-memory-stack`
+
+
+
+---**Region**: `us-east-1`
+
+
+
+## ☁️ S3 Storage**Response Format**:**Stefan** (`+16129782029`) has 4 stored memories and receives personalized greetings:graph TB
+
+
+
+### Complete Storage Structure### Lambda Functions
+
+
+
+```- `elevenlabs-agentic-memory-lambda-function-client-data````json
+
+s3://elevenlabs-agentic-memory-{account-id}-{region}/
+
+├── client-data/- `elevenlabs-agentic-memory-lambda-function-post-call`
+
+│   └── {caller_id}/
+
+│       └── {timestamp}_{call_sid}/- `elevenlabs-agentic-memory-lambda-function-search-data`{> "Hello Stefan! I know you prefer email updates. How can I assist you today?"    A[ElevenLabs Agent] --> B[ClientData API]
+
+│           ├── received.json         # Incoming webhook payload
+
+│           └── response.json         # Response sent to ElevenLabs
+
+│
+
+└── post-call/### API Gateway Endpoints  "type": "conversation_initiation_client_data",
+
+    ├── {caller_id}/
+
+    │   └── {conversation_id}.json    # Full transcription dataEach function has its own API Gateway for optimal performance:
+
+    │
+
+    └── audio-only/- ClientData: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`  "dynamic_variables": {    A --> C[Retrieve API] 
+
+        └── {agent_id}/
+
+            └── {conversation_id}.mp3  # Call recording- PostCall: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`
+
+```
+
+- Retrieve: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`    "caller_id": "+16129782029",
+
+### Storage Details
+
+
+
+#### ClientData Storage
+
+### S3 Storage    "memory_count": "4",## 🔗 Live Endpoints    A --> D[PostCall API]
+
+**Path**: `client-data/{caller_id}/{timestamp}_{call_sid}/`
+
+**Bucket**: `elevenlabs-agentic-memory-424875385161-us-east-1`
+
+**Files**:
+
+- `received.json`: Raw webhook payload from ElevenLabs**Purpose**: Backup storage for call data and audit trails    "memory_summary": "User wants to update email address",
+
+- `response.json`: Complete response sent back
+
+
+
+**Metadata**:
+
+```python### CloudWatch Logs    "returning_caller": "yes",    
+
+{
+
+    'caller_id': '+16129782029',**Retention**: 7 days
+
+    'agent_id': 'agent_xyz',
+
+    'call_sid': 'CA123',**Log Groups**:    "caller_name": "Stefan"
+
+    'timestamp': '2025-10-03T12:34:56',
+
+    'payload_type': 'received' | 'response'- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data`
+
+}
+
+```- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-post-call`  },- **ClientData**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`    B --> E[ClientData Lambda]
+
+
+
+**Use Cases**:- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-search-data`
+
+- Audit trail of all webhook requests
+
+- Debugging conversation initiation issues  "conversation_config_override": {
+
+- Analytics on caller patterns
+
+- Compliance and record-keeping---
+
+
+
+#### PostCall Transcription Storage    "agent": {- **PostCall**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`      C --> F[Retrieve Lambda]
+
+
+
+**Path**: `post-call/{caller_id}/{conversation_id}.json`## 🛠️ Development Workflow
+
+
+
+**Content**:      "prompt": {"prompt": "CALLER CONTEXT: This caller has 4 previous interactions..."},
+
+- Complete conversation transcript
+
+- Analysis results### Build & Deploy
+
+- Evaluation data
+
+- Call metadata```bash      "first_message": "Hello Stefan! I know you prefer email updates. How can I assist you today?"- **Retrieve**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`    D --> G[PostCall Lambda]
+
+
+
+**Example Path**: `post-call/+16129782029/conv_001.json`# 1. Build Lambda layer (required first)
+
+
+
+#### PostCall Audio Storagecd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..    }
+
+
+
+**Path**: `post-call/audio-only/{agent_id}/{conversation_id}.mp3`
+
+
+
+**Content**: Base64-decoded MP3 audio file# 2. Build SAM application  }    
+
+
+
+**Why separate directory?**  sam build
+
+Audio webhooks don't include `caller_id`, only `agent_id` and `conversation_id`. We save under `agent_id` to avoid database lookups.
+
+}
+
+**Correlation**: Both files share the same `conversation_id` for linking.
+
+# 3. Deploy
+
+### S3 Usage Examples
+
+sam deploy --guided  # First time```## 📞 Support    E --> H[Mem0 Cloud]
+
+```bash
+
+# List all ClientData requests for a callersam deploy           # Subsequent deploys
+
+aws s3 ls s3://elevenlabs-agentic-memory-424875385161-us-east-1/client-data/16129782029/ --recursive
+
+```
+
+# Download transcription data
+
+aws s3 cp s3://elevenlabs-agentic-memory-424875385161-us-east-1/post-call/+16129782029/conv_001.json ./
+
+
+
+# Download audio file### Monitoring### 2. PostCall Function (`src/post_call/handler.py`)    F --> H
+
+aws s3 cp s3://elevenlabs-agentic-memory-424875385161-us-east-1/post-call/audio-only/agent_xyz/conv_001.mp3 ./conversation.mp3
+
+```bash
+
+# Find both files for a conversation
+
+CONV_ID="conv_001"# Tail logs**Purpose**: Async memory storage after call completion
+
+aws s3 ls s3://elevenlabs-agentic-memory-424875385161-us-east-1/post-call/ --recursive | grep "$CONV_ID"
+
+```aws logs tail /aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data --follow
+
+
+
+---For setup issues, see the troubleshooting section in `MASTER_DOCUMENTATION.md` or check CloudWatch logs:    G --> H
+
+
+
+## 🎵 Audio Webhook Handling# Check for errors
+
+
+
+### Why Two Separate Webhooks?aws logs filter-log-events --log-group-name "/aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data" --filter-pattern "ERROR"**Endpoint**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`
+
+
+
+ElevenLabs sends **TWO separate webhooks** for each completed call:```
+
+
+
+1. **`post_call_transcription`** - Full conversation data (NO audio)    
+
+2. **`post_call_audio`** - Only base64-encoded MP3 audio
+
+---
+
+**Reason**: Efficient data delivery. Large audio files use chunked transfer encoding, while transcript data remains lightweight.
+
+**Processing**: Stores both factual summaries and semantic transcripts to Mem0
+
+### Original Issue
+
+## 🧪 Testing
+
+Audio files were NOT being saved because:
+
+- Old code expected `full_audio` in transcription webhook```bash    I[Lambda Layer<br/>mem0ai] --> E
+
+- **ElevenLabs no longer includes audio in transcription webhooks**
+
+- Audio now comes via separate webhook### Test Scripts
+
+
+
+### Implementation```bash### 3. Retrieve Function (`src/retrieve/handler.py`)  
+
+
+
+**Webhook Type Detection**:# Test individual endpoints
+
+```python
+
+webhook_type = payload.get('type')python3 scripts/test_clientdata.py**Purpose**: In-call semantic search for memory retrievalaws logs tail /aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data --follow    I --> F  
+
+
+
+if webhook_type == 'post_call_audio':python3 scripts/test_postcall.py
+
+    return handle_audio_webhook(webhook_data, response)
+
+elif webhook_type == 'post_call_transcription':python3 scripts/test_retrieve.py
+
+    # Handle transcription (memory storage, S3 JSON)
+
+    # ... existing logic
+
+```
+
+# Comprehensive test**Endpoint**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve````    I --> G
+
+**Audio Webhook Handler**:
+
+```pythonpython3 scripts/test_production_ready.py
+
+def handle_audio_webhook(data: Dict[str, Any], response: Dict[str, Any]):
+
+    """Process audio-only webhook"""```
+
+    conversation_id = data.get('conversation_id')
+
+    agent_id = data.get('agent_id')
+
+    full_audio_base64 = data.get('full_audio')
+
+    ### Test Data**Tool Configuration** (ElevenLabs):    
+
+    # Decode base64 audio
+
+    audio_binary = base64.b64decode(full_audio_base64)- **Stefan** (`+16129782029`): Has 4 stored memories, receives personalized greetings
+
+    
+
+    # Save to S3- **New numbers**: No memories, tests first-time caller flow```json
+
+    mp3_key = f"post-call/audio-only/{agent_id}/{conversation_id}.mp3"
+
+    s3_client.put_object(
+
+        Bucket=S3_BUCKET_NAME,
+
+        Key=mp3_key,### Expected Results{---    J[CloudWatch Logs] --> E
+
+        Body=audio_binary,
+
+        ContentType='audio/mpeg',**Stefan's Greeting**: "Hello Stefan! I know you prefer email updates. How can I assist you today?"
+
+        Metadata={
+
+            'agent_id': agent_id,**New Caller**: "Hello! Welcome to our memoir interview service. Could you please tell me your name?"  "name": "search_memory",
+
+            'conversation_id': conversation_id,
+
+            'webhook_type': 'post_call_audio'
+
+        }
+
+    )---  "description": "Search previous conversations and memories",    J --> F
+
+    
+
+    return response
+
+```
+
+## 🔍 Troubleshooting  "parameters": {
+
+### Processing Flow
+
+
+
+```
+
+Call Ends### Common Issues    "query": {"type": "string", "description": "What to search for"},*Built with AWS SAM, ElevenLabs Agents Platform, and Mem0 Cloud*    J --> G
+
+    ↓
+
+ElevenLabs Processes Call
+
+    ↓
+
+[Sends TWO webhooks - may arrive in any order]#### 1. "Invalid workspace key" Error    "user_id": {"type": "string", "default": "{{system__caller_id}}"}```
+
+    ↓
+
+┌─────────────────────────────┬──────────────────────────────┐**Cause**: ElevenLabs secrets not configured properly
+
+│ Transcription Webhook       │ Audio Webhook                │
+
+│ (post_call_transcription)   │ (post_call_audio)            │**Fix**:   }
+
+│                             │                              │
+
+│ • Full transcript           │ • Base64 MP3                 │1. Add `WORKSPACE_KEY` secret in ElevenLabs settings
+
+│ • Analysis results          │ • agent_id                   │
+
+│ • Metadata                  │ • conversation_id            │2. Map to `X-Workspace-Key` header in webhook config}**Infrastructure Components:**
+
+│ • caller_id/external_number │ (no caller_id!)              │
+
+│                             │                              │3. Verify agent has "fetch conversation initiation data" enabled
+
+│         ↓                   │         ↓                    │
+
+│  1. Verify HMAC             │  1. Verify HMAC              │```- 🏗️ **3 Lambda Functions** (Python 3.12, 256MB memory)
+
+│  2. Save JSON to S3         │  2. Decode base64            │
+
+│  3. Store in Mem0 (x2)      │  3. Save MP3 to S3           │#### 2. "Missing caller_id" Error  
+
+│  4. Return 200 OK           │  4. Return 200 OK            │
+
+└─────────────────────────────┴──────────────────────────────┘**Cause**: Webhook payload format incorrect- 🌐 **3 HTTP API Gateways** (separate for minimal routing latency)
+
+```
+
+**Fix**: Ensure payload includes `{"caller_id": "{{system__caller_id}}"}`
+
+### ElevenLabs Configuration
+
+---- 📦 **1 Shared Lambda Layer** (mem0ai package for reuse)
+
+To enable audio webhooks:
+
+#### 3. HMAC Signature Failures
+
+1. Go to [ElevenLabs Settings](https://elevenlabs.io/app/agents/settings)
+
+2. Enable "Post-Call Webhooks"**Cause**: Wrong HMAC key or timestamp drift- 📊 **CloudWatch Logs** (7-day retention for cost optimization)
+
+3. **Toggle "Send audio data" ON**
+
+4. Configure webhook URL (same as transcription)**Fix**: Verify HMAC key matches ElevenLabs configuration
+
+5. Add HMAC secret (same for both webhooks)
+
+## 🧠 Memory System- 🔧 **CloudFormation Stack** (Infrastructure as Code)
+
+**Important**: Both webhook types use the same endpoint and HMAC authentication!
+
+#### 4. Memory Not Found
+
+---
+
+**Cause**: User ID format mismatch
+
+## 🛠️ Development
+
+**Fix**: Ensure phone numbers use E.164 format (+1XXXXXXXXXX)
+
+### Local Development Setup
+
+### Memory Types## Quick Start
+
+```bash
+
+# Clone repository### Debug Commands
+
+git clone <repository-url>
+
+cd AgenticMemory```bash1. **Factual Memories** (`metadata.type = "factual"`)
+
+
+
+# Create virtual environment# Test endpoint manually
+
+python3 -m venv test_env
+
+source test_env/bin/activate  # On Windows: test_env\Scripts\activatecurl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \   - Call summaries and key facts### Prerequisites Checklist
+
+
+
+# Install development dependencies  -H 'X-Workspace-Key: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70' \
+
+pip install -r requirements.txt
+
+  -H 'Content-Type: application/json' \   - User preferences and account details
+
+# Create .env file for tests
+
+cp .env.example .env  -d '{"caller_id": "+16129782029"}' -v
+
+# Edit .env with your credentials
+
+```   - Used for dynamic variables and context- ✅ **AWS CLI** configured with appropriate credentials
+
+
+
+### Build & Deploy Workflow# Check CloudWatch logs  
+
+
+
+```bashaws logs tail /aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data --follow- ✅ **SAM CLI** installed ([Installation Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html))
+
+# STEP 1: Build Lambda layer (REQUIRED - all functions depend on it)
+
+cd layer
+
+mkdir -p python
+
+pip install -r requirements.txt -t python/# Get conversation data from ElevenLabs2. **Semantic Memories** (`metadata.type = "semantic"`)- ✅ **Python 3.12** installed
+
+cd ..
+
+curl https://api.elevenlabs.io/v1/convai/conversations/{conversation_id} \
+
+# STEP 2: Build SAM application
+
+sam build  -H "xi-api-key: sk_1203631b4b7e9d5e06cc793713322c3788daff35da4d23bf"   - Full conversation transcripts- ✅ **Mem0 Account** with API credentials:
+
+
+
+# STEP 3: Deploy```
+
+sam deploy --guided  # First time - saves config
+
+sam deploy           # Subsequent deploys   - Used for semantic search during calls  - API Key (starts with `mem0-...`)
+
+```
+
+**Debug Log Indicators**:
+
+**After deployment**, capture the three API URLs from outputs:
+
+- `ClientDataApiUrl` → Configure in ElevenLabs webhook- ✅ "Retrieving memories for user_id: +16129782029"   - Enables detailed recall of past conversations  - Organization ID (starts with `org_...`) 
+
+- `RetrieveApiUrl` → Configure in agent tool
+
+- `PostCallApiUrl` → Configure in post-call webhook- ❌ "Invalid workspace key" (means ElevenLabs config wrong)
+
+
+
+### Environment Variables- ❌ "Missing caller_id" (means payload format wrong)  - Project ID (starts with `proj_...`)
+
+
+
+All Lambda functions use these environment variables (set via SAM template):
+
+
+
+```yaml---### Memory Storage Process- ✅ **ElevenLabs Account** with webhook credentials:
+
+Environment:
+
+  Variables:
+
+    MEM0_API_KEY: m0-gS2X0TszRwwEC6mXE3DrEDtpxQJdcCWAariVvafD
+
+    MEM0_ORG_ID: org_knmmDKevT5Yz7bDF4Dd9BcFDWjp2RHzstpvtN3GW## 📂 Project Structure1. **Call Ends** → ElevenLabs sends webhook to PostCall  - Workspace Secret Key (starts with `wsec_...`)
+
+    MEM0_PROJECT_ID: proj_3VBb1VIAmQofeGcY0XCHDbb7EqBLeEfETd6iNFqZ
+
+    MEM0_DIR: /tmp/.mem0
+
+    S3_BUCKET_NAME: elevenlabs-agentic-memory-424875385161-us-east-1
+
+    ELEVENLABS_WORKSPACE_KEY: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70```2. **Extract Content** → Parse transcript and analysis  - HMAC Signing Key (for webhook verification)
+
+    ELEVENLABS_HMAC_KEY: wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3
+
+```Eleven Labs Agentic Memory/
+
+
+
+**Note**: Secrets are stored in `samconfig.toml` (gitignored). Each developer needs their own.├── README.md                          # 📋 This comprehensive guide3. **Generate Summary** → Create factual memory from key points
+
+
+
+### Monitoring & Debugging├── template.yaml                      # ☁️ SAM CloudFormation template
+
+
+
+```bash├── samconfig.toml                     # ⚙️ Deployment configuration (gitignored)4. **Store Both Types** → Save factual + semantic to Mem0## Project Structure
+
+# Tail CloudWatch logs (7-day retention)
+
+aws logs tail /aws/lambda/AgenticMemoriesClientData --follow├── requirements.txt                   # 🐍 Development dependencies
+
+aws logs tail /aws/lambda/AgenticMemoriesRetrieve --follow
+
+aws logs tail /aws/lambda/AgenticMemoriesPostCall --follow├── .env                              # 🔐 Environment variables (gitignored)5. **S3 Backup** → Store raw payload for audit trail
+
+
+
+# All logs include user_id/caller_id for filtering├── .gitignore                        # 📝 Git ignore rules
+
+aws logs filter-pattern /aws/lambda/AgenticMemoriesPostCall --filter-pattern "+16129782029"
+
+│```
+
+# Get function metrics
+
+aws cloudwatch get-metric-statistics \├── src/                              # 💼 Lambda function source code
+
+  --namespace AWS/Lambda \
+
+  --metric-name Duration \│   ├── client_data/### Memory Retrieval ProcessAgenticMemory/
+
+  --dimensions Name=FunctionName,Value=AgenticMemoriesClientData \
+
+  --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \│   │   └── handler.py                # 📞 Pre-call memory retrieval
+
+  --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
+
+  --period 300 \│   ├── post_call/1. **Call Starts** → ElevenLabs calls ClientData webhook├── 📄 SPECIFICATION.md           # Complete system specification
+
+  --statistics Average,Maximum
+
+│   │   └── handler.py                # 💾 Post-call memory storage
+
+# Check concurrent executions
+
+aws cloudwatch get-metric-statistics \│   └── retrieve/2. **Get All Memories** → Retrieve factual + semantic for caller├── 📖 README.md                  # Project documentation (this file)
+
+  --namespace AWS/Lambda \
+
+  --metric-name ConcurrentExecutions \│       └── handler.py                # 🔍 In-call memory search
+
+  --dimensions Name=FunctionName,Value=AgenticMemoriesClientData \
+
+  --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \│3. **Extract Name** → Use regex patterns to find caller name├── 🏗️ template.yaml              # SAM CloudFormation template
+
+  --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
+
+  --period 60 \├── layer/                            # 📦 Lambda layer dependencies
+
+  --statistics Maximum
+
+```│   ├── requirements.txt              # mem0ai package only4. **Generate Context** → Build personalized prompt override├── 📋 requirements.txt           # Development dependencies
+
+
+
+---│   └── python/                       # Built dependencies
+
+
+
+## 🧪 Testing│5. **Create Variables** → Populate dynamic variables for agent├── 🚫 .gitignore                 # Git ignore rules
+
+
+
+### Test Suite Overview├── scripts/                          # 🧪 Testing and utilities
+
+
+
+The project uses **integration tests** that hit real deployed endpoints:│   ├── test_clientdata.py├── 🤖 .github/
+
+
+
+```bash│   ├── test_postcall.py
+
+# Comprehensive production readiness test
+
+python3 test_production_ready.py│   ├── test_retrieve.py### Mem0 Cloud Configuration│   └── copilot-instructions.md   # AI coding assistant guidelines
+
+
+
+# Individual component tests│   ├── test_production_ready.py
+
+python3 test_client_data_s3.py          # ClientData webhook + S3 (4 tests)
+
+python3 test_audio_webhook.py           # Dual webhook system (2 tests)│   └── (other test scripts...)- **API Key**: `m0-gS2X0TszRwwEC6mXE3DrEDtpxQJdcCWAariVvafD`├── 📦 layer/
+
+python3 test_postcall_s3_path.py        # PostCall S3 paths
+
+python3 test_personalized_greetings.py  # Name extraction + greetings│
+
+python3 test_memory_direct.py           # Direct Mem0 connectivity
+
+```├── test_data/                        # 📊 Test payloads and data- **Organization ID**: `org_knmmDKevT5Yz7bDF4Dd9BcFDWjp2RHzstpvtN3GW`│   └── requirements.txt          # Lambda layer dependencies (mem0ai)
+
+
+
+### Test Data│   └── elevenlabs_post_call_payload.json
+
+
+
+**Known caller with memories**:│- **Project ID**: `proj_3VBb1VIAmQofeGcY0XCHDbb7EqBLeEfETd6iNFqZ`├── 🧪 test_*.py                  # Authentication & webhook test scripts
+
+- Phone: `+16129782029`
+
+- Name: Stefan├── tests/                            # 🔬 Unit tests
+
+- Memories: 4 stored conversations
+
+│   └── test_*.py- **User ID Format**: Phone numbers in E.164 format (`+16129782029`)└── 🔧 src/
+
+**New caller without memories**:
+
+- Any other phone number│
+
+- Expected: Generic greeting, no memories
+
+├── docs/                            # 📚 Documentation    ├── client_data/
+
+### Test Results
+
+│   └── archived/                    # 🗄️ Historical documentation
+
+**Last Test Run** (October 3, 2025):
+
+│---    │   └── handler.py            # Pre-call memory retrieval
+
+#### ClientData Tests: ✅ 4/4 PASSED
+
+- ✅ Known caller with memories└── .aws-sam/                       # 🏗️ SAM build artifacts (gitignored)
+
+- ✅ New caller without memories
+
+- ✅ Error handling (missing caller_id)```    ├── retrieve/
+
+- ✅ S3 bucket listing
+
+
+
+**Duration**: 6.27 seconds
+
+### Essential Commands## 🎤 ElevenLabs Integration    │   └── handler.py            # Mid-call semantic search
+
+#### Audio Webhook Tests: ✅ 2/2 PASSED
+
+- ✅ Transcription webhook (JSON saved)```bash
+
+- ✅ Audio webhook (MP3 saved)
+
+# Deploy    └── post_call/
+
+**Verified**:
+
+- HTTP 200 responsescd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..
+
+- S3 files created with correct paths
+
+- Proper metadata on S3 objectssam build && sam deploy### Agent Configuration Requirements        └── handler.py            # Post-call memory storage
+
+- Correlation via conversation_id
+
+
+
+### Local Testing with SAM
+
+# Test```
+
+```bash
+
+# Invoke function locally with test eventpython3 scripts/test_production_ready.py
+
+sam local invoke AgenticMemoriesClientData -e events/client_data.json
+
+#### 1. Conversation Initiation Webhook
+
+# Start local API Gateway
+
+sam local start-api  # Endpoints at http://localhost:3000# Monitor
+
+
+
+# Test local endpointaws logs tail /aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data --follow- **URL**: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`## ⚡ Deployment
+
+curl -X POST http://localhost:3000/client-data \
+
+  -H 'X-Workspace-Key: wsec_...' \
+
+  -H 'Content-Type: application/json' \
+
+  -d '{"caller_id": "+16129782029"}'# Debug- **Method**: POST
+
+```
+
+curl -X POST https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data \
+
+---
+
+  -H 'X-Workspace-Key: wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70' \- **Authentication**: Secrets Manager (NOT direct headers)> **💡 Tip**: The build process requires the Lambda layer to be built first since all functions depend on the shared mem0ai package.
+
+## 🔍 Troubleshooting
+
+  -H 'Content-Type: application/json' \
+
+### Common Issues
+
+  -d '{"caller_id": "+16129782029"}' -v- **Secret Name**: `WORKSPACE_KEY`
+
+#### 1. Lambda Layer Build Failures
+
+```
+
+**Symptom**: `Unable to import module 'handler': No module named 'mem0'`
+
+- **Secret Value**: `wsec_c345664e5d1cea8a9afe4750927861b65c6636b4267aef63448a73b5c9dbba70`### Step 1: Build the Lambda Layer
+
+**Cause**: Lambda layer not built or built incorrectly
+
+---
+
+**Fix**:
+
+```bash- **Header Mapping**: `X-Workspace-Key` → `WORKSPACE_KEY` secret
+
+cd layer
+
+rm -rf python  # Clean old build## 🤖 System Prompt Template
+
+mkdir -p python
+
+pip install -r requirements.txt -t python/```bash
+
+cd .. && sam build
+
+```The following system prompt should be used in your ElevenLabs agent configuration:
+
+
+
+#### 2. ClientData Returns 401/403#### 2. Agent Security Settingscd layer
+
+
+
+**Symptom**: Webhook fails with authentication error### ROLE IDENTITY
+
+
+
+**Possible Causes**:You are a patient, empathetic Memoir Interviewer agent designed for personal storytelling. You are integrated with Eleven Labs Agentic Memory for long-term recall and personalization.Enable in agent's Security tab:mkdir -p python
+
+- ❌ Workspace key not configured in ElevenLabs secrets
+
+- ❌ Header mapping incorrect (`X-Workspace-Key` → `WORKSPACE_KEY`)
+
+- ❌ Secret not enabled in agent Security tab
 
 ### CALLER CONTEXT VARIABLES- ✅ "Fetch conversation initiation data for inbound Twilio calls"pip install -r requirements.txt -t python/
 
+**Fix**: Verify ElevenLabs webhook configuration step-by-step
+
 - Caller ID: {{caller_id}}
+
+#### 3. Audio Files Not Saved
 
 - Returning Caller: {{returning_caller}}- ✅ Allow prompt overridescd ..
 
+**Symptom**: JSON files appear in S3 but no MP3 files
+
 - Caller Name: {{caller_name}}
 
-- Memory Count: {{memory_count}}- ✅ Allow first message overrides```
+**Possible Causes**:
 
-- Memory Summary: {{memory_summary}}
+- ❌ "Send audio data" toggle not enabled in ElevenLabs- Memory Count: {{memory_count}}- ✅ Allow first message overrides```
 
+- ❌ HMAC signature failing on audio webhook
 
+- ❌ Lambda timeout (increase to 60s)- Memory Summary: {{memory_summary}}
 
-### PERSONALITY & TONE
 
-- Warm, supportive, and encouraging#### 3. Search Memory Tool### Step 2: Build the SAM Application
 
-- Clear and accessible, avoiding jargon
-
-- Patient and understanding- **URL**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`
-
-- Respectful of caller's pace and comfort level
-
-- **Method**: POST```bash
-
-### YOUR CAPABILITIES
-
-1. Automatic memory context (prepended to this prompt by Eleven Labs Agentic Memory)- **Authentication**: Nonesam build
-
-2. Search Memory tool for retrieving specific past conversations and details
-
-3. Language detection and switching (English/Spanish)- **Parameters**: `query` (string), `user_id` (default: `{{system__caller_id}}`)```
-
-4. Interview guidance and storytelling facilitation
-
-
-
-### CONVERSATION FLOW
-
-#### For New Callers ({{returning_caller}} = "no")#### 4. Post-Call Webhook### Step 3: Deploy to AWS
-
-1. Welcome them warmly
-
-2. Ask for their name if not already known- **URL**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`
-
-3. Briefly explain how the system works:
-
-   - One question at a time approach- **Method**: POST#### Option A: Guided Deployment (First Time - Recommended)
-
-   - Available commands: 'help', 'pause', 'repeat'
-
-   - Memories are saved for future calls- **Authentication**: HMAC signature (auto-configured by ElevenLabs)
-
-4. Begin with opening memoir questions
-
-- **HMAC Secret**: `wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3````bash
-
-#### For Returning Callers ({{returning_caller}} = "yes")
-
-1. Greet them by name if available: "Hello {{caller_name}}!"sam deploy --guided
-
-2. Reference their previous sessions naturally (they have {{memory_count}} previous interactions)
-
-3. Use Search Memory tool to recall last session details### Dynamic Variables```
-
-4. Ask if they want to:
-
-   - Continue where they left offThe system provides these variables for ElevenLabs agents:
-
-   - Add details to previous stories
-
-   - Start a new topic- `{{caller_id}}` - Phone number (+16129782029)**You'll be prompted for:**
-
-
-
-### USING MEMORY CONTEXT- `{{returning_caller}}` - "yes" or "no"  - **Stack Name**: `sam-app` (or your preferred name)
-
-- The system automatically provides caller context at the start of each call
-
-- Reference past conversations naturally - don't say "checking my database"- `{{caller_name}}` - Extracted name (e.g., "Stefan")- **AWS Region**: `us-east-1` (or your preferred region)
-
-- Use Search Memory tool when caller references specific past topics:
-
-  - "What did I tell you about...?"- `{{memory_count}}` - Number of previous interactions- **Parameters** (keep these secure!):
-
-  - "Remember when I mentioned...?"
-
-  - "Did I already share my story about...?"- `{{memory_summary}}` - Most recent/important memory  ```
-
-
-
-#### Search Memory Usage  Mem0ApiKey: mem0-1234...
-
-Call search_memory when:
-
-- Caller asks about previous stories or topics---  Mem0OrgId: org_abc123...
-
-- You need specific details from past sessions
-
-- Caller wants to update or correct previous information  Mem0ProjectId: proj_xyz789...
-
-- You want to avoid asking repeated questions
-
-## ☁️ AWS Infrastructure  ElevenLabsWorkspaceKey: wsec_def456...
-
-Query examples:
-
-- search_memory("last interview topic")  ElevenLabsHmacKey: your-hmac-signing-key
-
-- search_memory("childhood memories")
-
-- search_memory("family stories")### CloudFormation Stack  ```
-
-
-
-### RESPONSE GUIDELINES**Name**: `elevenlabs-agentic-memory-stack`- **Confirm changes**: `Y`
-
-- Keep responses concise (under 3 sentences per turn)
-
-- One idea and one action per response**Region**: `us-east-1`- **Allow IAM role creation**: `Y` 
-
-- Always honor 'help', 'pause', and 'repeat' commands immediately
-
-- Confirm understanding before moving to next topic- **Save to samconfig.toml**: `Y` (saves parameters for future deployments)
-
-- Break complex questions into smaller parts
-
-### Lambda Functions
-
-### CONSTRAINTS & GUARDRAILS
-
-#### Never:- `elevenlabs-agentic-memory-lambda-function-client-data`#### Option B: Direct Deployment (With Parameters)
-
-- Ask overly invasive or traumatic questions without consent
-
-- Offer medical, legal, or financial advice- `elevenlabs-agentic-memory-lambda-function-post-call`
-
-- Express personal opinions or beliefs
-
-- Rush the caller or make them feel pressured- `elevenlabs-agentic-memory-lambda-function-search-data````bash
-
-- Ask questions the caller has already answered (use Search Memory first)
-
-- Make up information or assume detailssam deploy \
-
-
-
-#### Always:### API Gateway Endpoints  --stack-name sam-app \
-
-- Follow W3C/COGA accessibility guidelines
-
-- Respect caller's boundaries and comfort levelEach function has its own API Gateway for optimal performance:  --region us-east-1 \
-
-- Provide clear pause and help instructions
-
-- Confirm memories are being saved- ClientData: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`  --parameter-overrides \
-
-- Allow interruptions and natural conversation flow
-
-- PostCall: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`    Mem0ApiKey=<your-key> \
-
-### ERROR HANDLING
-
-- If Search Memory tool fails: "I'm having a moment of trouble accessing our previous conversations, but let's continue - I'm listening."- Retrieve: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`    Mem0OrgId=<your-org> \
-
-- If caller seems confused: Offer to repeat or rephrase
-
-- If technical issues: Apologize briefly and continue the interview    Mem0ProjectId=<your-project> \
-
-- If caller goes off-topic: Gently guide back to memoir storytelling
-
-### S3 Storage    ElevenLabsWorkspaceKey=<workspace-key> \
-
-### LANGUAGE SUPPORT
-
-- Offer English or Spanish at start of call**Bucket**: `elevenlabs-agentic-memory-424875385161-us-east-1`    ElevenLabsHmacKey=<hmac-key> \
-
-- Use Detect Language tool if caller speaks in non-default language
-
-- Store language preference in memories for future calls**Purpose**: Backup storage for call data and audit trails  --capabilities CAPABILITY_IAM \
-
-
-
-### CALL CONCLUSION  --resolve-s3
-
-Before ending each call:
-
-1. Summarize what was discussed today### CloudWatch Logs```
-
-2. Confirm their memories have been saved
-
-3. Invite them to call back anytime to continue**Retention**: 7 days
-
-4. Thank them for sharing their stories
-
-5. Say a warm goodbye**Log Groups**:### Step 4: Capture API Endpoints
-
-
-
-### EXAMPLE RESPONSES- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data`
-
-✓ Good: "Thank you for sharing that story about your grandmother. What was her name?"
-
-✗ Bad: "That's interesting. Tell me about your childhood, your family, and your earliest memories."- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-post-call`After successful deployment, **save these URLs** for ElevenLabs configuration:
-
-✓ Good: "I remember you mentioned your time in India. Would you like to add more details to that story?"
-
-✗ Bad: "Let me check my database for what you said last time about India."- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-search-data`
-
-✓ Good: "Take your time. I'm here when you're ready to continue."
-
-✗ Bad: "Let's move on to the next question quickly."```bash
-
-
-
-### VARIABLE HANDLING LOGIC---Outputs:
-
-- When {{returning_caller}} = "no": This is a new caller, focus on introduction and name collection
-
-- When {{returning_caller}} = "yes": This is a returning caller, use {{caller_name}} and {{memory_count}} for personalization✅ ClientDataApiUrl: https://abc123.execute-api.us-east-1.amazonaws.com/Prod/client-data
-
-- {{caller_name}} will only be populated when the system has extracted a name from previous conversations
-
-- {{memory_summary}} provides quick context about the caller's most recent or important memory## 🛠️ Development Workflow✅ RetrieveApiUrl: https://def456.execute-api.us-east-1.amazonaws.com/Prod/retrieve  
-
-- Use {{caller_id}} for any tool calls that require the user identification
-
-✅ PostCallApiUrl: https://ghi789.execute-api.us-east-1.amazonaws.com/Prod/post-call
-
----
-
-### Build & Deploy```
-
-## ✅ Current Status
+**Debugging**:
 
 ```bash
 
-- ✅ **Backend Deployed**: All 3 Lambda functions operational
+# Check CloudWatch logs for audio webhook### PERSONALITY & TONE
 
-- ✅ **Mem0 Integration**: Storing factual + semantic memories# 1. Build Lambda layer (required first)## 🔗 ElevenLabs Configuration
+aws logs tail /aws/lambda/AgenticMemoriesPostCall --follow | grep "post_call_audio"
 
-- ✅ **Authentication**: ElevenLabs secrets + HMAC configured
+- Warm, supportive, and encouraging#### 3. Search Memory Tool### Step 2: Build the SAM Application
 
-- ✅ **Testing**: Production-ready endpoints verifiedcd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..
+# Verify S3 audio directory
+
+aws s3 ls s3://elevenlabs-agentic-memory-424875385161-us-east-1/post-call/audio-only/ --recursive- Clear and accessible, avoiding jargon
+
+```
+
+- Patient and understanding- **URL**: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`
+
+#### 4. PostCall HMAC Validation Failures
+
+- Respectful of caller's pace and comfort level
+
+**Symptom**: PostCall logs show "HMAC signature verification failed"
+
+- **Method**: POST```bash
+
+**Possible Causes**:
+
+- ❌ HMAC key mismatch between code and ElevenLabs### YOUR CAPABILITIES
+
+- ❌ Timestamp drift > 30 minutes
+
+- ❌ Body modification (ensure raw body used)1. Automatic memory context (prepended to this prompt by Eleven Labs Agentic Memory)- **Authentication**: Nonesam build
+
+
+
+**Fix**:2. Search Memory tool for retrieving specific past conversations and details
+
+```bash
+
+# Verify HMAC key in Lambda3. Language detection and switching (English/Spanish)- **Parameters**: `query` (string), `user_id` (default: `{{system__caller_id}}`)```
+
+aws lambda get-function-configuration \
+
+  --function-name AgenticMemoriesPostCall \4. Interview guidance and storytelling facilitation
+
+  --query 'Environment.Variables.ELEVENLABS_HMAC_KEY'
+
+
+
+# Compare with ElevenLabs webhook configuration
+
+```### CONVERSATION FLOW
+
+
+
+#### 5. Stack Rollback on Deploy#### For New Callers ({{returning_caller}} = "no")#### 4. Post-Call Webhook### Step 3: Deploy to AWS
+
+
+
+**Symptom**: `Stack is in ROLLBACK_COMPLETE state`1. Welcome them warmly
+
+
+
+**Fix**:2. Ask for their name if not already known- **URL**: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`
+
+```bash
+
+# Delete and redeploy3. Briefly explain how the system works:
+
+aws cloudformation delete-stack --stack-name sam-app
+
+# Wait ~2 minutes for deletion   - One question at a time approach- **Method**: POST#### Option A: Guided Deployment (First Time - Recommended)
+
+sam build && sam deploy --guided
+
+```   - Available commands: 'help', 'pause', 'repeat'
+
+
+
+#### 6. Mem0 Connection Issues   - Memories are saved for future calls- **Authentication**: HMAC signature (auto-configured by ElevenLabs)
+
+
+
+**Symptom**: Timeout or connection errors to Mem04. Begin with opening memoir questions
+
+
+
+**Debugging**:- **HMAC Secret**: `wsec_a8dc8b6e25ec3ddf11d7e651c40a5cb4931c2ca39d161fa4c94139f12f3ba9d3````bash
+
+```bash
+
+# Verify environment variables#### For Returning Callers ({{returning_caller}} = "yes")
+
+aws lambda get-function-configuration \
+
+  --function-name AgenticMemoriesClientData \1. Greet them by name if available: "Hello {{caller_name}}!"sam deploy --guided
+
+  --query 'Environment.Variables' | grep MEM0
+
+2. Reference their previous sessions naturally (they have {{memory_count}} previous interactions)
+
+# Test Mem0 connectivity directly
+
+python3 test_memory_direct.py3. Use Search Memory tool to recall last session details### Dynamic Variables```
+
+```
+
+4. Ask if they want to:
+
+### Performance Issues
+
+   - Continue where they left offThe system provides these variables for ElevenLabs agents:
+
+#### Cold Start Latency (3-5 seconds)
+
+   - Add details to previous stories
+
+**Solutions**:
+
+1. **Reserved concurrency** (already set to 10)   - Start a new topic- `{{caller_id}}` - Phone number (+16129782029)**You'll be prompted for:**
+
+2. **Provisioned concurrency** (costs ~$12/month per instance):
+
+   ```yaml
+
+   AgenticMemoriesClientData:
+
+     Properties:### USING MEMORY CONTEXT- `{{returning_caller}}` - "yes" or "no"  - **Stack Name**: `sam-app` (or your preferred name)
+
+       ProvisionedConcurrencyConfig:
+
+         ProvisionedConcurrency: 2- The system automatically provides caller context at the start of each call
+
+   ```
+
+- Reference past conversations naturally - don't say "checking my database"- `{{caller_name}}` - Extracted name (e.g., "Stefan")- **AWS Region**: `us-east-1` (or your preferred region)
+
+#### Lambda Timeout (502 Bad Gateway)
+
+- Use Search Memory tool when caller references specific past topics:
+
+**Fix**: Increase timeout in `template.yaml`:
+
+```yaml  - "What did I tell you about...?"- `{{memory_count}}` - Number of previous interactions- **Parameters** (keep these secure!):
+
+AgenticMemoriesClientData:
+
+  Properties:  - "Remember when I mentioned...?"
+
+    Timeout: 60  # Up from 30 seconds
+
+```  - "Did I already share my story about...?"- `{{memory_summary}}` - Most recent/important memory  ```
+
+
+
+### Debug Workflow
+
+
+
+```bash#### Search Memory Usage  Mem0ApiKey: mem0-1234...
+
+# 1. Check stack status
+
+aws cloudformation describe-stacks --stack-name sam-appCall search_memory when:
+
+
+
+# 2. Check Lambda function status- Caller asks about previous stories or topics---  Mem0OrgId: org_abc123...
+
+aws lambda list-functions \
+
+  --query 'Functions[?contains(FunctionName, `AgenticMemories`)].{Name:FunctionName,State:State,LastModified:LastModified}'- You need specific details from past sessions
+
+
+
+# 3. Tail logs during test- Caller wants to update or correct previous information  Mem0ProjectId: proj_xyz789...
+
+aws logs tail /aws/lambda/AgenticMemoriesClientData --follow &
+
+python3 test_clientdata.py- You want to avoid asking repeated questions
+
+
+
+# 4. Query recent errors## ☁️ AWS Infrastructure  ElevenLabsWorkspaceKey: wsec_def456...
+
+aws logs filter-pattern /aws/lambda/AgenticMemoriesClientData \
+
+  --filter-pattern "ERROR" \Query examples:
+
+  --start-time $(date -d '1 hour ago' +%s)000
+
+- search_memory("last interview topic")  ElevenLabsHmacKey: your-hmac-signing-key
+
+# 5. Test endpoints manually
+
+curl -X POST <ClientDataApiUrl> \- search_memory("childhood memories")
+
+  -H "X-Workspace-Key: wsec_..." \
+
+  -H "Content-Type: application/json" \- search_memory("family stories")### CloudFormation Stack  ```
+
+  -d '{"caller_id": "+16129782029"}' \
+
+  -v  # Verbose output shows headers/status
+
+```
+
+### RESPONSE GUIDELINES**Name**: `elevenlabs-agentic-memory-stack`- **Confirm changes**: `Y`
+
+---
+
+- Keep responses concise (under 3 sentences per turn)
+
+## 📂 Project Structure
+
+- One idea and one action per response**Region**: `us-east-1`- **Allow IAM role creation**: `Y` 
+
+```
+
+AgenticMemory/- Always honor 'help', 'pause', and 'repeat' commands immediately
+
+├── src/
+
+│   ├── client_data/- Confirm understanding before moving to next topic- **Save to samconfig.toml**: `Y` (saves parameters for future deployments)
+
+│   │   └── handler.py              # Pre-call memory retrieval (318 lines)
+
+│   ├── retrieve/- Break complex questions into smaller parts
+
+│   │   └── handler.py              # Mid-call semantic search (94 lines)
+
+│   └── post_call/### Lambda Functions
+
+│       └── handler.py              # Post-call memory storage (187 lines)
+
+│### CONSTRAINTS & GUARDRAILS
+
+├── layer/
+
+│   └── requirements.txt            # Lambda layer: mem0ai only#### Never:- `elevenlabs-agentic-memory-lambda-function-client-data`#### Option B: Direct Deployment (With Parameters)
+
+│   └── python/                     # Built dependencies
+
+│- Ask overly invasive or traumatic questions without consent
+
+├── tests/
+
+│   ├── test_client_data_s3.py     # Comprehensive ClientData tests- Offer medical, legal, or financial advice- `elevenlabs-agentic-memory-lambda-function-post-call`
+
+│   ├── test_audio_webhook.py      # Dual webhook system tests
+
+│   ├── test_postcall_s3_path.py   # PostCall S3 path tests- Express personal opinions or beliefs
+
+│   ├── test_personalized_greetings.py
+
+│   └── test_production_ready.py   # Full system integration- Rush the caller or make them feel pressured- `elevenlabs-agentic-memory-lambda-function-search-data````bash
+
+│
+
+├── docs/- Ask questions the caller has already answered (use Search Memory first)
+
+│   ├── ELEVENLABS_SETUP_GUIDE.md  # Step-by-step ElevenLabs config
+
+│   ├── QUICK_REFERENCE.md         # Command reference card- Make up information or assume detailssam deploy \
+
+│   ├── CLAUDE.md                  # Extended development guide
+
+│   └── archived/                  # Historical documentation
+
+│
+
+├── template.yaml                   # SAM template (227 lines)#### Always:### API Gateway Endpoints  --stack-name sam-app \
+
+├── samconfig.toml                  # SAM deployment config (gitignored)
+
+├── requirements.txt                # Dev dependencies- Follow W3C/COGA accessibility guidelines
+
+├── README.md                       # This file
+
+└── .github/- Respect caller's boundaries and comfort levelEach function has its own API Gateway for optimal performance:  --region us-east-1 \
+
+    └── copilot-instructions.md    # GitHub Copilot context
+
+```- Provide clear pause and help instructions
+
+
+
+### Key Files- Confirm memories are being saved- ClientData: `https://idr7oxv9q6.execute-api.us-east-1.amazonaws.com/Prod/client-data`  --parameter-overrides \
+
+
+
+| File | Purpose | Lines |- Allow interruptions and natural conversation flow
+
+|------|---------|-------|
+
+| `src/client_data/handler.py` | Pre-call webhook handler | 318 |- PostCall: `https://knh457q7q7.execute-api.us-east-1.amazonaws.com/Prod/post-call`    Mem0ApiKey=<your-key> \
+
+| `src/retrieve/handler.py` | Semantic search handler | 94 |
+
+| `src/post_call/handler.py` | Post-call webhook handler | 187 |### ERROR HANDLING
+
+| `template.yaml` | SAM infrastructure definition | 227 |
+
+| `test_client_data_s3.py` | Comprehensive test suite | 400+ |- If Search Memory tool fails: "I'm having a moment of trouble accessing our previous conversations, but let's continue - I'm listening."- Retrieve: `https://zv39o5dkzi.execute-api.us-east-1.amazonaws.com/Prod/retrieve`    Mem0OrgId=<your-org> \
+
+| `test_audio_webhook.py` | Dual webhook tests | 300+ |
+
+- If caller seems confused: Offer to repeat or rephrase
+
+---
+
+- If technical issues: Apologize briefly and continue the interview    Mem0ProjectId=<your-project> \
+
+## 📚 Additional Resources
+
+- If caller goes off-topic: Gently guide back to memoir storytelling
+
+### Internal Documentation
+
+### S3 Storage    ElevenLabsWorkspaceKey=<workspace-key> \
+
+- **ELEVENLABS_SETUP_GUIDE.md**: Complete ElevenLabs configuration walkthrough
+
+- **AUDIO_WEBHOOK_IMPLEMENTATION.md**: Detailed audio webhook architecture### LANGUAGE SUPPORT
+
+- **CLIENT_DATA_S3_STORAGE.md**: S3 archival system documentation
+
+- **ELEVENLABS_WEBHOOK_COMPLIANCE.md**: Webhook format specifications- Offer English or Spanish at start of call**Bucket**: `elevenlabs-agentic-memory-424875385161-us-east-1`    ElevenLabsHmacKey=<hmac-key> \
+
+- **QUICK_REFERENCE.md**: Quick command reference card
+
+- **CLAUDE.md**: Extended development guide with all commands- Use Detect Language tool if caller speaks in non-default language
+
+
+
+### External References- Store language preference in memories for future calls**Purpose**: Backup storage for call data and audit trails  --capabilities CAPABILITY_IAM \
+
+
+
+- [Mem0 Lambda FAQ](https://docs.mem0.ai/faqs#how-do-i-configure-mem0-for-aws-lambda) - Lambda-specific configuration
+
+- [Mem0 ElevenLabs Integration](https://docs.mem0.ai/integrations/elevenlabs) - Official integration docs
+
+- [ElevenLabs Post-Call Webhooks](https://elevenlabs.io/docs/agents-platform/workflows/post-call-webhooks) - Webhook payload format### CALL CONCLUSION  --resolve-s3
+
+- [AWS SAM Developer Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/) - SAM CLI reference
+
+Before ending each call:
+
+---
+
+1. Summarize what was discussed today### CloudWatch Logs```
+
+## 🤝 Contributing
+
+2. Confirm their memories have been saved
+
+Contributions are welcome! Please:
+
+3. Invite them to call back anytime to continue**Retention**: 7 days
+
+1. Fork the repository
+
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)4. Thank them for sharing their stories
+
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+
+4. Push to the branch (`git push origin feature/amazing-feature`)5. Say a warm goodbye**Log Groups**:### Step 4: Capture API Endpoints
+
+5. Open a Pull Request
+
+
+
+---
+
+### EXAMPLE RESPONSES- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-client-data`
+
+## 📄 License
+
+✓ Good: "Thank you for sharing that story about your grandmother. What was her name?"
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+✗ Bad: "That's interesting. Tell me about your childhood, your family, and your earliest memories."- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-post-call`After successful deployment, **save these URLs** for ElevenLabs configuration:
+
+---
+
+✓ Good: "I remember you mentioned your time in India. Would you like to add more details to that story?"
+
+## 🎯 Current Status
+
+✗ Bad: "Let me check my database for what you said last time about India."- `/aws/lambda/elevenlabs-agentic-memory-lambda-function-search-data`
+
+### Production Readiness: 🟢 READY
+
+✓ Good: "Take your time. I'm here when you're ready to continue."
+
+**Completed**:
+
+- ✅ All Lambda functions deployed and tested✗ Bad: "Let's move on to the next question quickly."```bash
+
+- ✅ ClientData S3 archival implemented (4/4 tests passed)
+
+- ✅ PostCall dual webhook support (2/2 tests passed)
+
+- ✅ S3 storage structure optimized
+
+- ✅ Authentication properly configured### VARIABLE HANDLING LOGIC---Outputs:
+
+- ✅ Comprehensive test coverage
+
+- ✅ Documentation complete- When {{returning_caller}} = "no": This is a new caller, focus on introduction and name collection
+
+
+
+**Manual Steps Required**:- When {{returning_caller}} = "yes": This is a returning caller, use {{caller_name}} and {{memory_count}} for personalization✅ ClientDataApiUrl: https://abc123.execute-api.us-east-1.amazonaws.com/Prod/client-data
+
+- ⚠️ Configure webhooks in ElevenLabs dashboard (API doesn't support automation)
+
+- ⚠️ Add search_memory tool via dashboard- {{caller_name}} will only be populated when the system has extracted a name from previous conversations
+
+- ⚠️ Enable "Send audio data" toggle for audio webhooks
+
+- {{memory_summary}} provides quick context about the caller's most recent or important memory## 🛠️ Development Workflow✅ RetrieveApiUrl: https://def456.execute-api.us-east-1.amazonaws.com/Prod/retrieve  
+
+**Recommended**:
+
+- 🔔 Make test call to verify end-to-end functionality- Use {{caller_id}} for any tool calls that require the user identification
+
+- 🔔 Monitor CloudWatch logs for first few real calls
+
+- 🔔 Verify S3 files created from real ElevenLabs webhooks✅ PostCallApiUrl: https://ghi789.execute-api.us-east-1.amazonaws.com/Prod/post-call
+
+
+
+------
+
+
+
+## 📞 Support### Build & Deploy```
+
+
+
+For issues, questions, or contributions:## ✅ Current Status
+
+
+
+- **GitHub Issues**: [Create an issue](https://github.com/webmasterarbez/AgenticMemory/issues)```bash
+
+- **Documentation**: See `docs/` folder for detailed guides
+
+- **Tests**: Run `python3 test_production_ready.py` for system health check- ✅ **Backend Deployed**: All 3 Lambda functions operational
+
+
+
+---- ✅ **Mem0 Integration**: Storing factual + semantic memories# 1. Build Lambda layer (required first)## 🔗 ElevenLabs Configuration
+
+
+
+**Last Updated**: October 3, 2025  - ✅ **Authentication**: ElevenLabs secrets + HMAC configured
+
+**Version**: 1.0.0  
+
+**Status**: Production Ready 🚀- ✅ **Testing**: Production-ready endpoints verifiedcd layer && mkdir -p python && pip install -r requirements.txt -t python/ && cd ..
+
 
 - ✅ **Monitoring**: CloudWatch logs and error tracking
 

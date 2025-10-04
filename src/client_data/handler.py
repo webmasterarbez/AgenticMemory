@@ -10,7 +10,9 @@ import os
 import logging
 import re
 from typing import Dict, Any, List, Optional
+from datetime import datetime
 
+import boto3
 from mem0 import MemoryClient
 
 # Configure logging
@@ -24,7 +26,9 @@ client = MemoryClient(
     project_id=os.environ['MEM0_PROJECT_ID']
 )
 
-WORKSPACE_KEY = os.environ['ELEVENLABS_WORKSPACE_KEY']
+# Initialize S3 client outside handler for reuse
+s3_client = boto3.client('s3')
+S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', '')
 
 
 def extract_caller_name(all_memories: List[str]) -> Optional[str]:
@@ -137,6 +141,83 @@ def generate_personalized_greeting(
     return greeting
 
 
+def save_client_data_to_s3(
+    caller_id: str,
+    agent_id: str,
+    call_sid: str,
+    received_payload: Dict[str, Any],
+    response_payload: Dict[str, Any]
+) -> None:
+    """
+    Save received webhook payload and sent response payload to S3.
+    
+    Directory structure: client-data/{sanitized_caller_id}/{timestamp}_{call_sid}/
+    Files: received.json and response.json
+    
+    Args:
+        caller_id: Caller's phone number (e.g., +16129782029)
+        agent_id: ElevenLabs agent ID
+        call_sid: Twilio call SID
+        received_payload: The incoming webhook payload from ElevenLabs
+        response_payload: The response we sent back to ElevenLabs
+    """
+    if not S3_BUCKET_NAME:
+        logger.warning("S3_BUCKET_NAME not configured, skipping S3 save")
+        return
+        
+    try:
+        # Sanitize caller_id for S3 key (remove + prefix if present)
+        sanitized_caller_id = caller_id.lstrip('+')
+        
+        # Create timestamp for unique directory
+        timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+        
+        # Build S3 key prefix
+        key_prefix = f"client-data/{sanitized_caller_id}/{timestamp}_{call_sid}"
+        
+        # Save received payload
+        received_key = f"{key_prefix}/received.json"
+        logger.info(f"Saving received payload to S3: s3://{S3_BUCKET_NAME}/{received_key}")
+        
+        s3_client.put_object(
+            Bucket=S3_BUCKET_NAME,
+            Key=received_key,
+            Body=json.dumps(received_payload, indent=2),
+            ContentType='application/json',
+            Metadata={
+                'caller_id': caller_id,
+                'agent_id': agent_id,
+                'call_sid': call_sid,
+                'timestamp': datetime.utcnow().isoformat(),
+                'payload_type': 'received'
+            }
+        )
+        logger.info(f"Successfully saved received payload for call {call_sid}")
+        
+        # Save response payload
+        response_key = f"{key_prefix}/response.json"
+        logger.info(f"Saving response payload to S3: s3://{S3_BUCKET_NAME}/{response_key}")
+        
+        s3_client.put_object(
+            Bucket=S3_BUCKET_NAME,
+            Key=response_key,
+            Body=json.dumps(response_payload, indent=2),
+            ContentType='application/json',
+            Metadata={
+                'caller_id': caller_id,
+                'agent_id': agent_id,
+                'call_sid': call_sid,
+                'timestamp': datetime.utcnow().isoformat(),
+                'payload_type': 'response'
+            }
+        )
+        logger.info(f"Successfully saved response payload for call {call_sid}")
+        
+    except Exception as e:
+        logger.error(f"Error saving client data to S3: {str(e)}", exc_info=True)
+        # Don't raise - S3 save failure shouldn't block the webhook response
+
+
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     """
     Handle ElevenLabs Conversation Initiation webhook.
@@ -147,34 +228,35 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
     Returns:
         Personalized data with memories for the caller
+    
+    Note: 
+        ElevenLabs Conversation Initiation webhooks do NOT include authentication headers.
+        Security is based on keeping the webhook URL secret (URL obscurity).
+        This is different from PostCall webhooks which use HMAC signatures.
     """
     try:
-        # Validate workspace key authentication
-        headers = event.get('headers', {})
-        workspace_key = headers.get('x-workspace-key') or headers.get('X-Workspace-Key')
-
-        if workspace_key != WORKSPACE_KEY:
-            logger.error("Invalid workspace key")
-            return {
-                'statusCode': 401,
-                'headers': {'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'Unauthorized'})
-            }
-
         # Parse request body
         body = json.loads(event.get('body', '{}'))
         
-        # Support both caller_id and system__caller_id (ElevenLabs variations)
+        # Extract parameters from ElevenLabs webhook payload
+        # Official format: {"caller_id": "+1234567890", "agent_id": "agent_xyz", "called_number": "+1987654321", "call_sid": "CAxx..."}
         caller_id = body.get('caller_id') or body.get('system__caller_id')
+        agent_id = body.get('agent_id')
+        called_number = body.get('called_number')
+        call_sid = body.get('call_sid')
+        
+        # Log incoming webhook parameters for debugging
+        logger.info(f"Webhook received - caller_id: {caller_id}, agent_id: {agent_id}, called_number: {called_number}, call_sid: {call_sid}")
 
         if not caller_id:
-            logger.error("Missing caller_id or system__caller_id in request")
+            logger.error(f"Missing caller_id in request. Body received: {json.dumps(body)}")
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'Missing caller_id'})
+                'body': json.dumps({'error': 'Missing caller_id parameter in request body'})
             }
 
+        logger.info(f"Conversation initiation - caller_id: {caller_id}, agent_id: {agent_id}, called_number: {called_number}, call_sid: {call_sid}")
         logger.info(f"Retrieving memories for user_id: {caller_id}")
 
         # Retrieve all memories for the caller
@@ -285,6 +367,12 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             dynamic_vars["caller_name"] = caller_name
 
         # Build response with ElevenLabs conversation_initiation_client_data format
+        # Official format per ElevenLabs docs:
+        # {
+        #   "type": "conversation_initiation_client_data",
+        #   "dynamic_variables": { ... all agent dynamic variables ... },
+        #   "conversation_config_override": { "agent": { "prompt": {...}, "first_message": "..." }, "tts": {...} }
+        # }
         response_data = {
             "type": "conversation_initiation_client_data",
             "dynamic_variables": dynamic_vars,
@@ -297,6 +385,18 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             }
         }
+        
+        # Save received and response payloads to S3 (async, non-blocking)
+        try:
+            save_client_data_to_s3(
+                caller_id=caller_id,
+                agent_id=agent_id or 'unknown',
+                call_sid=call_sid or 'unknown',
+                received_payload=body,
+                response_payload=response_data
+            )
+        except Exception as e:
+            logger.error(f"Failed to save to S3, but continuing: {str(e)}")
 
         return {
             'statusCode': 200,

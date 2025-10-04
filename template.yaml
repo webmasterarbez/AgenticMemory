@@ -157,6 +157,7 @@ Resources:
           MEM0_PROJECT_ID: !Ref Mem0ProjectId
           MEM0_DIR: /tmp/.mem0
           ELEVENLABS_WORKSPACE_KEY: !Ref ElevenLabsWorkspaceKey
+          S3_BUCKET_NAME: !Ref ElevenLabsAgenticMemoryBucket
       Events:
         HttpApi:
           Type: HttpApi

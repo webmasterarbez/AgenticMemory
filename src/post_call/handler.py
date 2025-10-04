@@ -87,7 +87,7 @@ def save_to_s3(external_number: str, conversation_id: str, payload: Dict[str, An
     """
     Save conversation JSON and audio MP3 to S3.
 
-    Directory structure: {external_number}/{conversation_id}.json and .mp3
+    Directory structure: post-call/{external_number}/{conversation_id}.json and .mp3
 
     Args:
         external_number: Caller's phone number (e.g., +15074595005)
@@ -95,11 +95,11 @@ def save_to_s3(external_number: str, conversation_id: str, payload: Dict[str, An
         payload: Full webhook payload
     """
     try:
-        # Sanitize external_number for S3 key (remove + prefix if present)
-        sanitized_number = external_number.lstrip('+')
+        # Sanitize external_number for S3 key (keep + prefix for consistency with client-data)
+        sanitized_number = external_number  # Keep the + prefix
         
-        # Save JSON payload
-        json_key = f"{sanitized_number}/{conversation_id}.json"
+        # Save JSON payload with post-call/ prefix
+        json_key = f"post-call/{sanitized_number}/{conversation_id}.json"
         logger.info(f"Saving JSON to S3: s3://{S3_BUCKET_NAME}/{json_key}")
         
         s3_client.put_object(
@@ -115,14 +115,14 @@ def save_to_s3(external_number: str, conversation_id: str, payload: Dict[str, An
         )
         logger.info(f"Successfully saved JSON for conversation {conversation_id}")
 
-        # Save MP3 audio if present
+        # Save MP3 audio if present (legacy - audio now comes via separate post_call_audio webhook)
         full_audio_base64 = payload.get('full_audio')
         if full_audio_base64:
             try:
                 # Decode base64 audio to binary
                 audio_binary = base64.b64decode(full_audio_base64)
                 
-                mp3_key = f"{sanitized_number}/{conversation_id}.mp3"
+                mp3_key = f"post-call/{sanitized_number}/{conversation_id}.mp3"
                 logger.info(f"Saving MP3 to S3: s3://{S3_BUCKET_NAME}/{mp3_key} ({len(audio_binary)} bytes)")
                 
                 s3_client.put_object(
@@ -144,6 +144,74 @@ def save_to_s3(external_number: str, conversation_id: str, payload: Dict[str, An
 
     except Exception as e:
         logger.error(f"Error saving to S3: {str(e)}", exc_info=True)
+
+
+def handle_audio_webhook(data: Dict[str, Any], response: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Handle post_call_audio webhook separately.
+    
+    Audio webhooks contain only:
+    - agent_id
+    - conversation_id  
+    - full_audio (base64-encoded MP3)
+    
+    Args:
+        data: Audio webhook data object
+        response: Pre-built 200 OK response
+        
+    Returns:
+        200 OK response (processing is async, errors logged but don't affect response)
+    """
+    try:
+        conversation_id = data.get('conversation_id', 'unknown')
+        agent_id = data.get('agent_id', 'unknown')
+        full_audio_base64 = data.get('full_audio')
+        
+        logger.info(f"Processing audio webhook for conversation {conversation_id}")
+        
+        if not full_audio_base64:
+            logger.error(f"No full_audio field in audio webhook for {conversation_id}")
+            return response
+        
+        # We don't have caller_id in audio webhook, so we need to use a placeholder
+        # The audio webhook is sent separately and doesn't include metadata
+        # We'll save it under a special "audio-only" directory for now
+        # In production, you might want to correlate this with the transcription webhook
+        # or extract caller_id from your database using conversation_id
+        
+        # For now, save under agent_id directory
+        try:
+            # Decode base64 audio to binary
+            audio_binary = base64.b64decode(full_audio_base64)
+            
+            # Save to S3 with agent_id as fallback organization
+            mp3_key = f"post-call/audio-only/{agent_id}/{conversation_id}.mp3"
+            logger.info(f"Saving audio-only MP3 to S3: s3://{S3_BUCKET_NAME}/{mp3_key} ({len(audio_binary)} bytes)")
+            
+            s3_client.put_object(
+                Bucket=S3_BUCKET_NAME,
+                Key=mp3_key,
+                Body=audio_binary,
+                ContentType='audio/mpeg',
+                Metadata={
+                    'agent_id': agent_id,
+                    'conversation_id': conversation_id,
+                    'timestamp': datetime.utcnow().isoformat(),
+                    'webhook_type': 'post_call_audio'
+                }
+            )
+            logger.info(f"Successfully saved audio-only MP3 for conversation {conversation_id}")
+            
+        except Exception as e:
+            logger.error(f"Error saving audio-only MP3 to S3: {str(e)}", exc_info=True)
+        
+        # Audio webhooks don't trigger memory storage (no transcript/analysis data)
+        logger.info(f"Audio webhook processing complete for {conversation_id}")
+        
+    except Exception as e:
+        logger.error(f"Error processing audio webhook: {str(e)}", exc_info=True)
+    
+    return response
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -183,18 +251,37 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Parse payload
         payload = json.loads(raw_body)
         
-        # Handle ElevenLabs formats:
+        # Determine webhook type
+        webhook_type = None
+        webhook_data = None
+        
+        # Handle ElevenLabs webhook formats:
         # Format 1 (array): [{"type": "post_call_transcription", "data": {...}}]
         # Format 2 (object): {"type": "post_call_transcription", "event_timestamp": ..., "data": {...}}
+        # Format 3 (object): {"type": "post_call_audio", "event_timestamp": ..., "data": {...}}
+        
         if isinstance(payload, list) and len(payload) > 0:
-            if 'data' in payload[0]:
-                logger.info("Detected ElevenLabs array format, extracting data")
-                payload = payload[0]['data']
-        elif isinstance(payload, dict) and 'data' in payload and 'type' in payload:
-            # Single object with type and data fields
-            logger.info(f"Detected ElevenLabs object format (type={payload.get('type')}), extracting data")
-            payload = payload['data']
-
+            webhook_type = payload[0].get('type')
+            webhook_data = payload[0].get('data', {})
+            logger.info(f"Detected ElevenLabs array format, type: {webhook_type}")
+        elif isinstance(payload, dict) and 'type' in payload:
+            webhook_type = payload.get('type')
+            webhook_data = payload.get('data', {})
+            logger.info(f"Detected ElevenLabs object format, type: {webhook_type}")
+        else:
+            # Legacy format without type field
+            logger.info("Detected legacy format without type field, assuming transcription")
+            webhook_type = 'post_call_transcription'
+            webhook_data = payload
+        
+        # Handle audio webhook separately (only saves audio, no memory storage)
+        if webhook_type == 'post_call_audio':
+            logger.info("Processing post_call_audio webhook")
+            return handle_audio_webhook(webhook_data, response)
+        
+        # Continue with transcription webhook processing
+        payload = webhook_data
+        
         # Extract required fields
         conversation_id = payload.get('conversation_id', 'unknown')
         agent_id = payload.get('agent_id', 'unknown')
@@ -212,15 +299,23 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Extract caller_id from multiple possible locations
         caller_id = None
         
-        # 1. Try metadata.caller_id (direct format)
-        caller_id = metadata.get('caller_id')
+        # 1. Try payload.external_number (root level)
+        caller_id = payload.get('external_number')
+        if caller_id:
+            logger.info(f"Extracted caller_id from payload.external_number: {caller_id}")
         
-        # 2. Try metadata.phone_call.external_number (ElevenLabs format)
+        # 2. Try metadata.caller_id (direct format)
+        if not caller_id:
+            caller_id = metadata.get('caller_id')
+            if caller_id:
+                logger.info(f"Extracted caller_id from metadata.caller_id: {caller_id}")
+        
+        # 3. Try metadata.phone_call.external_number (ElevenLabs format)
         if not caller_id and 'phone_call' in metadata:
             caller_id = metadata['phone_call'].get('external_number')
             logger.info(f"Extracted caller_id from metadata.phone_call.external_number: {caller_id}")
         
-        # 3. Try conversation_initiation_client_data.dynamic_variables.system__caller_id
+        # 4. Try conversation_initiation_client_data.dynamic_variables.system__caller_id
         if not caller_id and 'conversation_initiation_client_data' in payload:
             conv_init = payload['conversation_initiation_client_data']
             dvars = conv_init.get('dynamic_variables', {})
